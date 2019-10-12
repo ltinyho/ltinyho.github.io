@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[idea 将多个 git commit 记录合并]]></title>
+    <url>%2F2019%2F10%2F11%2Fidea-git-commit-merge%2F</url>
+    <content type="text"><![CDATA[]]></content>
+      <tags>
+        <tag>idea</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[go 内存模型]]></title>
+    <url>%2F2019%2F08%2F06%2Fgo-memory-model%2F</url>
+    <content type="text"><![CDATA[原文 The Go Memory ModelGo的内存模型描述的是”在一个 groutine中 对变量进行读操作能够侦测到在其他goroutine中对该变量的写操作”的条件。 Happens Before对变量 v 的读 read r 要观测到 write w 对变量 v 的写,需要同时满足: r 不发生在 w 之前 没有其他的 w’ 对变量 v 的写发生在 w 之后, r 之前. 为了保证 read 观察到唯一一个 write w.必须同时满足: w 发生在 r之前 其他 write 发生在 w 之前或者 r 之后这对条件比前一对更严格,要求没有其他的 write 没有与 w 或者 r 并发执行. 在单个 goroutine 中没有并发,是满足这两个条件的,保证 r 能看到 w 对 v 的写入.在多个 goroutine 共享变量 v 时,必须使用同步事件满足 happens-before 条件确保 read 能读取到期望的 writes. 同步goroutine 创建 The go statement that starts a new goroutine happens before the goroutine’s execution begins1234567891011package mainvar a stringfunc f()&#123; print(a)&#125;func hello()&#123; a = "hello world" go f()&#125; 调用 hello 将会打印 “hello world”,可能发生在 hello return 之前或者之后. channel 通信 A send on a channel happens before the corresponding receive from that channel completes. 在一个channel中,发送 happens-before 相应的接收完成之前.The closing of a channel happens before a receive that returns a zero value because the channel is closed. 关闭一个 channel happens-before 接收返回的 0 值之前.为 0 值是因为 channel 被关闭.123456789101112package mainvar c = make(chan int,10)var a = ""func f()&#123; a = "hello world" c &lt;- 1 // 先发生,可以替换成 close(c)&#125;func main()&#123; go f() &lt;- c print(a)&#125; A receive from an unbuffered channel happens before the send on that channel completes. 无缓冲 channel 的接收 happens-before 在发送完成之前.123456789101112package mainvar c = make(chan int,0)var a = ""func f()&#123; a = "hello world" c &lt;- 1 // 先发生,可以替换成 close(c)&#125;func main()&#123; go f() &lt;- c print(a)&#125; The kth receive on a channel with capacity C happens before the k+Cth send from that channel completes. 容量为 C 的 channel 第 k 次接收 happens-before k+C 次发送完成之前.无缓存通道就是C 为 0 时的特殊情况. 不正确的同步1234567891011121314var a stringvar done boolfunc setup() &#123; a = "hello, world" done = true&#125;func main() &#123; go setup() for !done &#123; &#125; print(a)&#125; 对于主线程来说, setup 里面的执行顺序是不一致的, done = true 可能发生在 a 赋值之前,更糟糕的是, setup goroutine 中对 done 的修改,对主线程来说可能是不可见的,将导致主线程死循环. 解决同步问题的思路:使用显示的同步机制.]]></content>
+      <categories>
+        <category>go</category>
+      </categories>
+  </entry>
+  <entry>
+    <title><![CDATA[mysql 分表实践]]></title>
+    <url>%2F2019%2F06%2F23%2Fmysql-split-table%2F</url>
+    <content type="text"><![CDATA[公司有一个有 6000w 数据量的大表,在查询插入时慢,希望通过分表解决这个问题. 总共分为如下步骤: 分表数规划 分表主键选择 同步脚本编写 增量数据处理 上线迁移分表数量规划 现有 6000w 数据是 3-4 年的积累, 规划为 单表上线为 500w,现在业务高速发展的时期,希望能支撑未来 2-3 年的使用,取 2^5=32 张表,可容纳的总数据量为 32*500w= 1.6亿,满足业务需求. 主键选择为了保证数据的均匀性,使用唯一主键作为分表主键,使用 hashcode函数,对 32 取余,分到各个表中. 同步脚本的编写开始编写脚本时,发现了两个问题 在取旧数据时使用的 offset 加 limit 的方式,由于 offset 越到后面需要计算的数据量越大,同步特别的慢, 使用单个线程跑同步脚本,并且还是单条循环插入 第一次改善如下: 1.使用主键id区间的模式获取数据,提升的查询的速度 1SELECT * from tablename where id &gt; prevId and id &lt;= nextId 开启了 32 个 goroutine 同时插入 第一次改善提升了查询的速度,但是插入的速度还是很慢. 第二次改善如下: 将单条插入改为拼接 sql 语句插入,大大提高了插入速度但是这个引起了另外一个问题:原来的数据里面有特殊的字符,如:&#39;,\等,在插入时会引起 sql语句语法错误,所以需要将他们进行转义.最开始将&#39;转义成&#39;&#39;,没什么问题,但是 gorm 在执行时会将 \ 转义掉,所以需要将 \ 转义成\\\\.最开始没有发现转义的问题,测试同步完成检验数据的时候发现数据量对不上,然后在同步时将打印错误 log 时才发现.脚本如下 ./sync.sh 2&gt;&gt; logs. 增量数据处理因为业务一直在跑,不能中断,增量数据处理同步写入旧表和新表,待业务低峰期(😂😂半夜) 切换数据表. 上线迁移上线迁移时,发现磁盘容量不足,需要先扩容磁盘,防止磁盘写满.]]></content>
+  </entry>
+  <entry>
+    <title><![CDATA[go 重试机制]]></title>
+    <url>%2F2019%2F06%2F01%2Fgo-retry%2F</url>
+    <content type="text"><![CDATA[在日常编码中,有很多不确定结果,比如网络请求,不确定什么时候能够成功,这就需要我们有一种重试机制,保证服务的高可用性. 重试分为以下几种情况: 重试固定次数 12345678910// 重试固定次数func RetryCount(count int, fn func() error) bool &#123; for i := 0; i &lt; count; i++ &#123; err := fn() if err == nil &#123; return true &#125; &#125; return false&#125; 在特定时间内重试不定次数,失败后休眠一段时间后继续重试 12345678910111213141516171819202122232425// 在 duration 内,一直调用 fn,直到成功,失败后等待 sleepfunc RetryToTimeOut(duration time.Duration, sleep time.Duration, fn func() error) bool &#123; ch := make(chan struct&#123;&#125;) isEnd := false go func() &#123; for &#123; if isEnd &#123; break &#125; err := fn() if err == nil &#123; break &#125; time.Sleep(sleep) &#125; ch &lt;- struct&#123;&#125;&#123;&#125; &#125;() select &#123; case &lt;-ch: return true case &lt;-time.After(duration): isEnd = true return false &#125;&#125; 如果自定义的函数不是返回error,需要使用闭包再包一下.]]></content>
+      <categories>
+        <category>go</category>
+      </categories>
+      <tags>
+        <tag>go</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[iterm2 使用]]></title>
+    <url>%2F2019%2F05%2F07%2Fmac-iterm2-config%2F</url>
+    <content type="text"><![CDATA[iterm2 终端置顶操作,参照下面设置 https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus]]></content>
+      <categories>
+        <category>mac</category>
+      </categories>
+      <tags>
+        <tag>mac</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[vue 打包兼容性处理]]></title>
+    <url>%2F2019%2F04%2F24%2Fvue-package-compatible-resolve%2F</url>
+    <content type="text"><![CDATA[最近在新加入一个包时,导致打包后的代码不能在低版本的 ios 上运行,使用模拟器查看,发现打包后的代码还存在 es6 的代码，导致不兼容。 调试步骤 安装 xcode与 simulator，需要安装 ios 低版本的模拟器 打包代码,请先开启不压缩代码,方便查看.具体关闭压缩方式,查看文档,vue-cli vue.config.js 配置为 config.optimization.minimize=false 打开模拟器，开启 safari 调试模式,如截图所示 在 safari 中查看具体的报错信息,定位问题 问题原因加入的新包作者没有提供编译后的代码,所以需要自己处理一下vue.config.js 配置如下12// 处理未经 `babel` 编译的包transpileDependencies: ['tencent-wx-jssdk'] 使用 jenkins 打包,使用的 cnpm安装的包,打包后会出现问题,换成 npm 打包就没有问题,具体原因还没有查清楚.]]></content>
+      <categories>
+        <category>vue</category>
+      </categories>
+      <tags>
+        <tag>vue</tag>
+        <tag>vux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[复盘服务器不稳定问题]]></title>
+    <url>%2F2019%2F02%2F27%2Fservice-problem-record%2F</url>
+    <content type="text"><![CDATA[问题描述最近市场的同学通过一系列活动激活了很多用户,日活用户激增,导致服务器不稳定.根据以往经验一一排查,下面是排查问题的过程. 1.一般都是数据库的瓶颈,查看数据库的 cpu使用率 和 cpu负载 都正常,加了一个只读库,情况大大好转. 2.然后排查服务器的 cpu使用率 和 cpu负载,也是正常. 3.排查容器服务节点的资源消耗,应用服务容器节点 cpu使用率 在正常的情况. 4.怀疑 自定义路由 proxy 服务的问题,遂查看服务容器节点的资源消耗,发现 cpu使用率 有时候会超过100%,决定增加 proxy 的容器数量.增加 proxy 容器数量需要新加集群节点,所以决定新增服务器. 5.新增服务器后情况得到缓解,但是还有服务不稳定的情况.这个时候 ecs 的 cpu使用率 和 cpu负载都很低了, proxy 的资源消耗有部分节点 cpu使用率超过100%,但是大部分已经是正常的了.这个时候一直找不到原因,但是用户那边一直反馈服务还是不稳定.一直认为是 proxy 的问题,所以提交了工单,询问阿里云工程师怎样提高proxy服务的cpu资源,阿里云工程师建议使用 scale,增加 proxy 容器的数量.因为重新调度 proxy 会导致服务停止30s左右,为了不影响用户,也不确定是否能解决问题,所以决定等晚上再操作,继续增加容器节点,提高 proxy 容器节点. 6.增加服务器后,情况并没有得到缓解,还是会出现该问题.同时,同事查看了负载均衡的监控数据,发现负载均衡出现丢弃连接数,正常情况1个丢弃连接数都不应该出现的,查看负载均衡配置,只支持 5000 并发连接数,遂升级负载均衡配置,后续持续观察,服务变得稳定. 中间插曲 1.新增容器节点服务部署失败,拉取不了镜像.新增的节点没有绑定公网 ip,不能访问公网,需要绑定公网 ip 或者使用 vpc 的 NAT网关. 2.新增容器节点连不上 redis,最开始没有设置 redis连接白名单,后来设置之后还是连不上,提交阿里云工单咨询工程师,白名单添加无效,经阿里云修复后解决.将 redis 也加到安全组中. 3.对阿里云容器服务编排模板自定义便签 cpu_shares: 50 #0.5核 和 mem_limit: 536870912 #512MB的认知有歧义,在不确定意思的情况下进行了操作.查询 docker 文档后 容器资源限制docker 默认对容器不做限制. 问题再次出现预防手段确定问题排查步骤服务架构排查步骤增加服务报警 并发丢弃报警 总结经过这次事件,总结如下: 1、需要对整个流程都清晰 2、不清楚的操作一定要在了解清楚后在操作，不要拿用户去冒险 3、犯的错误需要记录下来，转变成文字]]></content>
+      <categories>
+        <category>复盘</category>
+      </categories>
+      <tags>
+        <tag>后端</tag>
+        <tag>服务器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[黑苹果装机问题记录]]></title>
+    <url>%2F2019%2F02%2F24%2Fhackintosh-problem%2F</url>
+    <content type="text"><![CDATA[台式机装机问题下载镜像，制作启动U盘台式机配置: CPU i7-8700 主板 华硕 B360 显卡 GTX 1050 TI 镜像版本 10.13.6 一般都到黑果小兵下载, 我安装的是 10.13.6，最新 10.14 驱不动。下载完成使用 TransMac 制作启动盘 制作启动盘教程 其他正常安装即可 遇到的问题遇到问题还是要查英文,中文真的找不到. 黑苹果安装到最后两分钟卡住不动https://www.tonymacx86.com/threads/mojave-installation-freezes-at-2-minutes-left.262173/page-3#post-1855421 24楼提供的解决方案我是以网友提供的EFI为主,加上我原来就能启动的EFI的里面的驱动目录覆盖他的驱动,我的EFI 下载地址 黑苹果 webdriver 显卡不能切换成独显https://www.tonymacx86.com/threads/nvidia-releases-alternate-graphics-drivers-for-macos-high-sierra-10-13-6-387-10-10-10-40.255913/ 1楼提供的解决方案,需要下载软件,下载地址,设置Bootloaders &gt; Clover UEFI Boot Mode + Emulated NVRAM` 即可 黑苹果双屏问题https://www.tonymacx86.com/threads/solved-black-screen-with-dual-monitor-connected.223082/page-4第39楼驱动装好之后,接双屏不能启动.首先需要开启 BIOS 的 CMS 模式,然后修改配置,修改软件 Clover Configurator我的正确配置如下图 笔记本装机问题hd630 显存只有 7M,修改设置 Devices Fake ID,ig-platform-id.注意需要 IntelGraphicsDVMTFixup.kext 驱动 原来的ig-platform-id=0x12345678 根据对应设备设置对应的ig-platform-id即可.]]></content>
+      <categories>
+        <category>黑苹果</category>
+      </categories>
+      <tags>
+        <tag>hackintosh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[redis 入门]]></title>
+    <url>%2F2018%2F12%2F08%2Fredis-start%2F</url>
+    <content type="text"><![CDATA[一、概述redis 使用C语言编写的高性能键值对内存数据库,仓库地址 支持的键值数据类型: 字符串 列表 有序集合 散列 集合 redis的主要应用场景: 缓存 消息队列 计数 排行榜 二、redis 数据类型键值对key的注意事项： 不要过长 最好不要超过1024个字节,不仅消耗内存，也影响查找效率 不要过短 比如设置为a，没有实际意义，可能会降低key的可读性 统一命名规范 字符串string 中的一个 key 对应一个 value 常用命令: set key value # 赋值 get key # 取值 getset key value # 取原值并设置新值 incr key # 自增1,如果该key不存在，则创建该key，并赋值为0，key存在,则自增加1 incrby key num # 自增指定值 decr key # 自减 decrby key num # 自减指定值 哈希 hashhash可以存储多个键值对之间的映射 hset key field value # 设置单个 hmset key field value [field value ... ] # 一次设置多个 列表 lpush key value [value ...] # 从列表左边推入 rpush key value [value ...] # 从列表右边推入 lrange key start stop # 查看列表,lrange key 0 -1 查看整个列表 通用 key 操作 expire key second # 设置 key 的有效期 ttl key # 查看 key 的离到期还剩多少秒 type key # 查看 key 的类型 del key #删除 key 参考资料 Redis 入门笔记]]></content>
+      <tags>
+        <tag>redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[消息队列]]></title>
+    <url>%2F2018%2F12%2F08%2Fmq-study%2F</url>
+    <content type="text"><![CDATA[一、概述消息队列(Message queue),简称MQ,是一种进程间通信或者同一进程的不同线程间的通信方式。通用的使用场景为: 不需要立即获取结果,但是并发量又要进行控制时。 二、使用场景消息队列主要使用场景： 异步处理：多应用对消息队列中同一消息进行处理，应用间并发处理消息，减少处理时间。 应用耦合：多应用对消息队列中同一消息进行处理，避免应用接口失败导致整个过程的失败。 限流削峰: 避免流量过大导致应用挂掉。 消息驱动的系统：系统分为消息队列、消息生产者、消息消费者，生产者负责产生消息，消费者(可能有多个)负责对消息进行处理. 多个子系统由消息队列连接起来,比如:日志处理.三、消息队列的两种模式 消息队列包括两种模式，点对点模式（point to point， queue）和发布/订阅模式（publish/subscribe，topic). 点对点模式,主要是一个消息只有一个消费者.当消费者接收到消息后,向消息队列通知应答成功,消息队列将该消息从队列中删除.点对点模式特点: 每个消息只有一个接收者（Consumer)； 发送者和接收者间没有依赖性，发送者发送消息之后，不管有没有接收者在运行，都不会影响到发送者下次发送消息； 接收者在成功接收消息之后需向队列应答成功，以便消息队列删除当前接收的消息； 发布订阅模式,发布者将消息发送到Topic,系统将这些消息传递给多个订阅者.发布/订阅模式特点: 每个消息可以有多个订阅者； 发布者和订阅者之间有时间上的依赖性。针对某个主题（Topic）的订阅者，它必须创建一个订阅者之后，才能消费发布者的消息。 为了消费消息，订阅者需要提前订阅，并保持在线运行； 当发布者消息量很大时，显然单个订阅者的处理能力是不足的,多个订阅者节点组成一个订阅组负载均衡消费topic消息实现分组订阅.]]></content>
+      <tags>
+        <tag>mq</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[删除文件]]></title>
+    <url>%2F2018%2F12%2F04%2Fremove-file%2F</url>
+    <content type="text"><![CDATA[删除指定文件目录123456abctest.mdtest.rartest1.rar 12345678910111213141516# 删除所有以 .rar 结尾的文件和目录rm -rf *.rar# 删除所有不是以 .rar 结尾的文件和目录ls | grep -v *.rar | xargs rm -rf# 将 ls 替换成 find 可以删除指定目录下的文件和目录find . | grep -v ".*rar" | xargs rm -rffind . ! -name "*.rar" | xargs rm -rf # ! 代表 -notfind . ! -name "*.rar" --exec # ! 代表 -not# 删除 所有的 a 文件find . -name "a" -type f | xargs rm -rf# 删除 所有的 a 目录find . -name "a" -type d -exec rm -rf &#123;&#125; \;#]]></content>
+      <tags>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[shell 学习]]></title>
+    <url>%2F2018%2F12%2F02%2Fshell-study%2F</url>
+    <content type="text"><![CDATA[变量1234567name=lzhnames=(1 2 3 4)echo $&#123;name&#125;echo $&#123;names&#125;echo $1 # 参数1echo $@ # 所有参数echo $* # 所有参数 字符串12345str=lzhstr="lzh $&#123;str&#125;""haha"echo $&#123;#str&#125; # 字符串长度echo $&#123;str:1:3&#125; # 截取字符串从下标1开始往后面3个字符 数组1234names=(1 2 3 4)echo $&#123;names[1]&#125; #echo $&#123;names[@]&#125; 所有数组元素echo $&#123;#names[@]&#125; 数组长度 运算符流程控制1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859if [[ $1 &gt; 10]]then echo &quot;参数大于10&quot;fifor file in $@do if [[ -e $&#123;file&#125; ]] then rm -rf $&#123;file&#125; else echo &quot;$&#123;file&#125; not exis&quot; fidonea=100while (($a &gt; 0))do echo $&#123;a&#125;done# while循环可用于读取键盘信息while read filedo if [[ -e $&#123;file&#125; ]] then rm -rf $&#123;file&#125; else echo &quot;$&#123;file&#125; not exis&quot; fidone# 无限循环wihle :dodonewhile truedodonefor ((;;))# casename=$1case $&#123;name&#125; in 1) echo 1 ;; 2) echo 2 ;; 3) echo 3 ;; *) echo &quot;不在1-3&quot;esac test 命令1234if test -f ./env.shthen echo 1fi 文件测试运算符1234567-d 文件夹-f 文件-r 可读-w 可写-x 可执行-e 检测文件（包括目录）是否存在-s 文件是否为空 123456if [[ -f ./env.sh ]]then echo "文件存在"else echo "文件不存在"fi 函数12345678910111213141516hello()&#123;for name in $@doecho &quot;hello $&#123;name&#125;&quot;done&#125;hello $@# 带返回值的函数add()&#123; return `expr $1 + 2`&#125;add 1echo $? # 函数返回值在调用该函数后通过 $? 来获得 重定向123echo 1 &gt; 1.md # 以覆盖的方式重定向echo 2 &gt;&gt; 2.md # 以追加的方式重定向wc -l &lt; 1.md # 键盘获取输入的命令会转移到文件读取内容 12345678910# here document 用来将输入重定向到一个交互式 Shell 脚本或程序。wc -l &lt;&lt; EOF 213 bd dasf as dasfEOF# 结尾的delimiter 一定要顶格写，前面不能有任何字符，后面也不能有任何字符# 包括空格和 tab 缩进。# 开始的delimiter前后的空格会被忽略掉。 脚本中执行另一个脚本12. ./env.shsource ./env.sh 需要注意路径,路径为脚本执行的时候路径 常用命令12345678#获取当前命令的绝对路径basePath=$(cd `dirname $0`; pwd)# 清空文件&gt; filenameecho &quot;&quot; &gt;filename: &gt; filenamecat /dev/null &gt; filename grepgrep 全称为 Global Regular Expression Print 主要还是查看文档 grep --help123456grep ltinyho test.md-i 忽略大小写-r或-R 递归查找目录-w 查找单词-v 匹配所有不满足的条件 psps命令是Process Status的缩写 123-A 或者 -e 全部进程e 显示环境变量f 显示程序之间的关系 netstat1234567netstat -nlput -n 显示网络地址-l 监听的端口-p pid-u udp-t tcp sed (steam editor)使用数据流重导向,不修改源文件 12345678# 删除第3行到最后一行nl test.md | sed '3,$d' # a新增,d删除,i插入,p打印,c取代# 将ltinyho 替换为 hahanl test.md | sed "s/ltinyho/haha/g" &gt; new.md# 打印包含 ltinyho 的行nl test.md | sed "/ltinyho/p"# 删除包含ltinyho 的行nl test.md | sed "/ltinyho/d" awkawk工作流程是这样的：读入有’\n’换行符分割的一条记录，然后将记录按指定的域分隔符划分域，填充域，$0则表示所有域,$1表示第一个域,$n表示第n个域。默认域分隔符是”空白键” 或 “[tab]键”.1234last -n 100#ltinyho pts/2 2.2.71.1 Wed Dec 5 21:44 still logged in#ltinyho pts/1 1.2.71.1 Wed Dec 5 21:05 still logged inlast -n 100 | awk '&#123;print $3&#125;' # 打印 ip 这一列 crontab定时任务通过 crontab 可以在固定时间间隔执行shell script. 查看 crontab 日志 重新启动 sudo service cron restart12345678910# m(minute) h(hour) dom(day of month) mon(month) dow(day of week)# 每隔1分钟执行 shell,并将错误输出和标准输出重定向到log文件中,注意 2&gt;&amp;1 在最后* * * * * ~/shell/echo.sh &gt;&gt; $HOME/log/crontab/log.log 2&gt;&amp;1 # 18-6时每刻执行 0,15,30,45 18-6 * * * # 0,30 8-11 */2 * * 其他注意事项新创建的cron job，不会马上执行，至少要过2分钟才执行。如果重启cron则马上执行。注意环境变量问题,有时我们创建了一个crontab，但是这个任务却无法自动执行，而手动执行这个任务却没有问题，这种情况一般是由于在crontab文件中没有配置环境变量引起的。]]></content>
+  </entry>
+  <entry>
+    <title><![CDATA[思考]]></title>
+    <url>%2F2018%2F11%2F25%2Fshare-think%2F</url>
+    <content type="text"><![CDATA[我不停的擦拭手中的利剑，不是因为我喜欢它，也不是因为它能带来安全，只是因为，每当下一次冲锋的号角响起时，我能够迅速拔出，纵横厮杀，直至战斗结束，不让自己倒下。 …… 生活在这样的时代，与其被迫上场，心怀恐惧，不如主动征伐，加入时代的滚滚大潮当中，去见识一下时代的风采，写下自己的故事。]]></content>
+      <tags>
+        <tag>think</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[mysql 学习]]></title>
+    <url>%2F2018%2F11%2F08%2Fmysql-backup%2F</url>
+    <content type="text"><![CDATA[mysql 学习备份表数据12create table2 backup select * from table1]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>msyql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[minipack]]></title>
+    <url>%2F2018%2F09%2F04%2Fminiwebpack%2F</url>
+    <content type="text"><![CDATA[一直使用 webpack 打包项目，但不知道它的原理是什么，给自己有一种很飘的感觉，所以花时间专门学习 webpack。 简单的模块打包工具webpack官网有一个视频，介绍怎么构建自己的 webpack， BUILD YOUR OWN WEBPACK by Ronen Amiel和 示例代码 怎样得到文件的依赖图谱呢？打包工具有一个 entry 入口文件，通过分析入口文件，得到入口文件的依赖，维护当前文件的依赖列表。然后循环依赖列表，再得到依赖文件的依赖。每个依赖都要自己的模块 id，通过模块 id 可以很方便的找到文件。 Babylon 是 Babel 中使用的 JavaScript 解析器，通过 babylon 得到 AST，在 AST 中，可以得到当前文件的依赖文件列表。同时可以将得到的 AST 使用其他的 loader 转译代码，比如：通过 babel-core 将 es6 转译成 es5。 怎样执行代码上一步已经得到了依赖图谱，通过依赖图谱，生成以 id 为 key 的 模块 map,这样可以很快的通过 id 找到对应的模块。 123456789101112(function(modules) &#123; function require(id) &#123; const [fn, mapping] = modules[id]; function localRequire(name) &#123; return require(mapping[name]); &#125; const module = &#123; exports : &#123;&#125; &#125;; fn(localRequire, module, module.exports); return module.exports; &#125; require(0); &#125;)(&#123;$&#123;modules&#125;&#125;) 通过自定义 require 函数，将生成的 code 中根据文件路径 require的文件，替换为对应的模块。通过传入函数内部的 module对象，通过对象引用的方式，拿到模块导出的值。]]></content>
+      <tags>
+        <tag>js</tag>
+        <tag>webpack</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[vue 组件动态引入 js、css]]></title>
+    <url>%2F2018%2F08%2F28%2Finser-file-in-vue-component%2F</url>
+    <content type="text"><![CDATA[有一些文件只在部分页面用到，其他页面用不到，但是不想全局引入，所以需要在组件中动态引入。 在vue组件动态引入js、css文件下面是引入百度的 umeditor 富文本编辑器 123456789101112131415161718192021222324252627282930function insertJs(src) &#123; return new Promise((resolve, reject) =&gt; &#123; const tag = document.createElement('script'); tag.type = 'text/javascript'; tag.src = src; const s = document.getElementsByTagName('head')[0]; s.appendChild(tag); tag.addEventListener('load', resolve); &#125;); &#125; function insertCss(src) &#123; return new Promise((resolve, reject) =&gt; &#123; const tag = document.createElement('link'); tag.href = src; tag.type = 'text/css'; tag.rel = 'stylesheet'; const s = document.getElementsByTagName('head')[0]; s.appendChild(tag); tag.addEventListener('load', resolve); &#125;); &#125; const UMEDITOR_HOME_URL = ''; window.UMEDITOR_HOME_URL = UMEDITOR_HOME_URL; insertCss(`$&#123;UMEDITOR_HOME_URL&#125;themes/default/css/umeditor.css`); insertJs('http://www.kaoyaya.com/source/js/jquery/jquery-1.10.2.min.js'); insertJs(`$&#123;UMEDITOR_HOME_URL&#125;umeditor.min.js`); insertJs(`$&#123;UMEDITOR_HOME_URL&#125;umeditor.config.js`).then(() =&gt; &#123; insertJs(`$&#123;UMEDITOR_HOME_URL&#125;lang/zh-cn/zh-cn.js`); &#125;); 在文件入口插入js]]></content>
+      <categories>
+        <category>vue</category>
+      </categories>
+      <tags>
+        <tag>vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[setTimeout、setImmediate 和process.nextTick]]></title>
+    <url>%2F2018%2F05%2F29%2FsetTimeout-setImmediate-process.nextTick%2F</url>
+    <content type="text"><![CDATA[setTimeout 、setImmediate 和 process.nextTick 在 nodejs 的使用中，为了不阻塞程序的运行，经常会使用到定时器，将任务在当前事件的循环末尾或者下个事件循环的开始执行。 setTimeout 的使用形式一般是 setTimeout(fn,0)，当然我们知道 浏览器端setTimeout 最小时间间隔是不得低于4毫秒，它的执行时机是在下一个事件循环的开始。setImmediate和setTimeout执行顺序是不确定的。 如果两者都在主模块中调用，那么执行先后取决于进程性能，也就是随机。 如果两者都不在主模块调用（被一个异步操作包裹），那么setImmediate的回调永远先执行。process.nextTick和Promise` 都属于微任务，它们会在所属的事件循环最后，并在进入下一个事件循环之前执行。 在具体实现上，process.nextTick()的回调函数保存在一个数组中，setImmediate() 的结果则是保存在链表中。在行为上，process.nextTick() 在每轮循环中会将数组中的回调函数全部执行完，而 setImmediate() 在每轮循环中执行链表中的一个回调函数。这样设计的原因是为了保证每轮循环都能较快的执行结束，防止 CPU 占用过多而阻塞后续 I/O 调用的情况。 参考文章：由setTimeout和setImmediate执行顺序的随机性窥探Node的事件循环机制]]></content>
+      <categories>
+        <category>nodejs</category>
+      </categories>
+  </entry>
+  <entry>
+    <title><![CDATA[原型模式]]></title>
+    <url>%2F2018%2F03%2F27%2Fprototype%2F</url>
+    <content type="text"><![CDATA[假设我们在编写一个飞机大战的网页游戏。某种飞机拥有分身技能，当它使用分身技能的时 候，要在页面中创建一些跟它一模一样的飞机。如果不使用原型模式，那么在创建分身之前，无 疑必须先保存该飞机的当前血量、炮弹等级、防御等级等信息，随后将这些信息设置到新创建的 飞机上面，这样才能得到一架一模一样的新飞机。如果使用原型模式，我们只需要调用负责克隆的方法，便能完成同样的功能。 js中调用 Object.create()即可克隆对象。 123456789101112function Person(name)&#123; this.name=name&#125;Person.prototype.say = function()&#123; console.log(this.name);&#125;var me = new Person('ltinyho')var myClone = Object.create(me)myClone.say();var myClone2 = &#123;&#125;myClone2.__proto__ = me;myClone2.say(); 原型模式一定有一个根对象，其他的对象一定是从某个已经存在的对象生成的，然后在添加它自己的属性和方法。在这些对象上就会形成一条原型链，当调用某个对象的方法时，如果在它本身没有这个方法，那么就会从原型链一直向上找，直到根对象为止。js中的根对象为Object.prototype,它是这个空对象。12var a = &#123;&#125;Object.getPrototypeOf(a)===Object.prototype // true 构造函数 创建一个对象 将构造函数的作用域赋给新对象。（因此this指向了新对象） 执行构造函数中的代码。（为这个新对象添加属性） 如果不调用return ，默认返回这个对象,显式的return一个对象会影响结果，返回原始值不会。 对象的原型链是如何查找的呢?要完成查找，每个对象首先至少得记住自己的原型，知道自己从哪里来的。js 给对象提供了一个名为__proto__的隐藏属性，某个对象的 __proto__属性默认指向它的构造器原型对象，即 {Constructor}.prototype ，当在自己找不到属性时，就会到这个对象上查找。但是一个对象的 Constructor 可能会被修改。原因是 js中每个对象都是从 Object.prototype 对象克隆而来的，如果这样的话，只能得到单一的继承关系，即每个对象都是继承于 Object.protoype。但是对象构造器的原型并不仅限于 Object.prototype 上，而是可以动态的指向其他对象。看一下以下代码：12345678910111213function A()&#123;&#125;A.prototype.name= 'A'A.prototype.say = function()&#123; console.log(this.name);&#125;function B()&#123;&#125;var a = new A()B.prototype = a;var b= new B()console.log(b.name);b.__proto__===B.prototype // true 首先遍历 b 上的所有属性，没有找到 name 。 查找 name 属性的请求被委托给 b 的 b.__proto__， b.__proto__记录了构造器原型 B.prototype,而B.prototype指向一个通过 new A() 创建的对象。 然后就到 a 的 属性上遍历，还是没有。然后到a.__proto__记录的 A.prototype 上找的构造器原型上找，找到了。 注意：当在本身查找不到时，是先到 __proto__ 上去找， 如果一个对象已经创建，__proto__ 确定了，这时改变 这个对象的 constructor 并不会改变原型链。 this, call, apply, bindJavaScript 的 this 总是指向一个对象，而具体指向哪个对象是在运行时基于函数的执行环境动态绑定的，而非函数被声明时的环境。this的指向大致分为四种 对象的方法调用 普通函数调用 构造函数调用 Function.prototype.call和Function.prototype.apply调用 call和applycall和apply可以修改函数内部的this指向，它们的区别只在于参数的不同。第一个参数都为this指向的对象，第二个参数call接收一个参数，apply则以数组的形式接收。 call和apply的用途 改变this的指向 实现bind方法 借用其他对象的方法 bind的实现123456Function.prototype.bind = function()&#123; var self = this, context = [].shift.call( arguments ),args = [].slice.call( arguments ); return function()&#123; return self.apply( context, [].concat.call( args, [].slice.call( arguments ) ) ); &#125; &#125;; 从上面可以看出，bind 会返回一个新的函数,并且可以传入参数，作为新生成函数的预置的参数。]]></content>
+      <tags>
+        <tag>js</tag>
+        <tag>prototype</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[macro tasks 和 micro tasks 学习]]></title>
+    <url>%2F2018%2F03%2F26%2Fmacro-task-and-micro-task%2F</url>
+    <content type="text"><![CDATA[今天看了一篇有关macro和micro任务的文章，记录一下学习所获。文章地址 Tasks, microtasks, queues and schedules 首先感受一下代码 61234567891011console.log(&apos;start&apos;)setTimeout(()=&gt;&#123; console.log(&apos;sto&apos;);&#125;,0)new Promise().then(()=&gt;&#123; console.log(&apos;promise 1&apos;);&#125;).then(()=&gt;&#123; console.log(&apos;promise 2&apos;);&#125;)console.log(&apos;end&apos;) 上面这段代码的打印顺序为 start,end,promise1,promise2,sto。 为什么会这样呢？这里需要我们理解事件循环是如何处理macro tasks 和 micor tasks 的。 每一个线程都有自己的事件循环，这样每个线程能够独立，所有的同源窗口共享同一个事件循环，这样它们就能够同步通信。 一个事件循环存在多个事件源，这样按照不同任务源的优先级执行，确保了任务源的执行顺序。 前面刚复习过 Promise，立即 resolve的 Promise 在本次事件循环的末尾执行。 macro 和 micro 区别promise 为什么是 micro]]></content>
+      <tags>
+        <tag>js</tag>
+        <tag>promise</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[es6 Promise 复习]]></title>
+    <url>%2F2018%2F03%2F25%2Fpromise%2F</url>
+    <content type="text"><![CDATA[Promise 三种状态pending,rejected,fulfilled，只有异步操作的结果能够决定当前的状态，并且状态一旦改变，不能修改。 一般来说，调用resolve或reject以后，Promise 的使命就完成了，后继操作应该放到then方法里面，而不应该直接写在resolve或reject的后面。所以，最好在它们前面加上return语句，这样就不会有意外 123456789 // 立即resolve的Promise在本轮事件循环的末尾执行的。new Promise((resolve, reject) =&gt; &#123; console.log(1); return resolve(2); console.log(3);&#125;).then((res) =&gt; &#123; console.log(res);&#125;); then方法返回一个新的Promise，返回的参数作为下一个then方法的函数参数，如果返回的是一个Promise，下一个then会等待Promise状态确定。12345678910111213141516new Promise((resolve, reject) =&gt; &#123; resolve(new Promise((resolve1) =&gt; &#123; setTimeout(() =&gt; &#123; resolve1('resolve 1000'); &#125;, 1000); &#125;));&#125;).then((res) =&gt; &#123; console.log(res); return new Promise((resolve1) =&gt; &#123; setTimeout(() =&gt; &#123; resolve1('resolve 2000'); &#125;, 2000); &#125;);&#125;).then(res =&gt; &#123; console.log(res);&#125;); Promise.resolvePromise.resolve 有四种情况 传入Promise，不做任何处理 传入包含then方法的对象 传入原始值或不包含then方法的对象 不传任何参数 12345678910111213141516171819// Promise.resolvevar pp1 = Promise.resolve(&#123; a: '1' &#125;);pp1.then(res =&gt; &#123; console.log(res);&#125;);// 会调用对象的then方法，结果 先打印hahaah 在打印Promise.resolve+then,这是因为立即resolve的Promise会在本次事件循环末尾调用var pp2 = Promise.resolve(&#123; a: '2', then(resolve) &#123; resolve('Promise.resolve+then'); console.log('hahaah'); &#125;&#125;);pp2.then(res =&gt; &#123; console.log(res);&#125;);// 如果没有then方法，会直接传入then 方法的回调函数的参数 Promise.try不管是同步还是异步操作,Promise.try为所有操作提供了统一的处理机制，所以如果想用then方法管理流程,最好都用Promise.try包装一下。12345678// Promise.try() // 实现方法Promise.try = function (func) &#123; return new this(function (resolve) &#123; resolve(func()); &#125;);&#125;; 错误处理promise错误会一直向后传递,如果没有指定catch方法的话，Promise对象抛出的错误不会传递到外层代码。 Promise.all或Promise.race单个Promise没有调用自己的的catch方法，那么会被 Promise.all().catch() 或 Promise.race().catch() 捕获错误。 实现自己的Promise首先 Promises/A+规范标准 官网地址。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146147148149150151152153function MyPromise(executor) &#123; var self = this; self.status = 'pending'; self.data = null; self.onResolvedCallback = []; self.onRejectdCallback = []; function resolve(value) &#123; if (value instanceof MyPromise) return value.then(resolve, reject); // 保证立即调用的resolve后面then方法添加的函数能够执行 setTimeout(() =&gt; &#123; if (self.status === 'pending') &#123; self.status = 'fulfilled'; self.data = value; for (var i = 0, len = self.onResolvedCallback.length; i &lt; len; i++) &#123; self.onResolvedCallback[i](value); &#125; &#125; &#125;, 0); &#125; function reject(reason) &#123; setTimeout(() =&gt; &#123; if (self.status === 'pending') &#123; self.status = 'reject'; self.data = reason; for (var i = 0, len = self.onRejectdCallback.length; i &lt; len; i++) &#123; self.onRejectdCallback[i](reason); &#125; &#125; &#125;, 0); &#125; try &#123; executor(resolve, reject); &#125; catch (e) &#123; reject(e); &#125;&#125;function resolvePromise(promise2, x, resolve, reject) &#123; var then; var thenCalledOrThrow = false; // 保证 resolve ,reject 只执行一次 if (promise2 === x) &#123; return reject(new TypeError('Chaining cycle detected for promise!')); &#125; if (x instanceof MyPromise) &#123; if (x.status === 'pending') &#123; //because x could resolved by a Promise Object x.then(function (v) &#123; resolvePromise(promise2, v, resolve, reject); &#125;, reject); &#125; else &#123; //but if it is resolved, it will never resolved by a Promise Object but a static value; x.then(resolve, reject); &#125; return; &#125; if ((x !== null) &amp;&amp; ((typeof x === 'object') || (typeof x === 'function'))) &#123; try &#123; then = x.then; //because x.then could be a getter if (typeof then === 'function') &#123; then.call(x, function rs(y) &#123; if (thenCalledOrThrow) return; thenCalledOrThrow = true; return resolvePromise(promise2, y, resolve, reject); &#125;, function rj(r) &#123; if (thenCalledOrThrow) return; thenCalledOrThrow = true; return reject(r); &#125;); &#125; else &#123; resolve(x); &#125; &#125; catch (e) &#123; if (thenCalledOrThrow) return; thenCalledOrThrow = true; return reject(e); &#125; &#125; else &#123; resolve(x); &#125;&#125;MyPromise.prototype.then = function (onResolve, onRejectd) &#123; var self = this; var promise2; onResolve = typeof onResolve === 'function' ? onResolve : function (value) &#123; /* 解决值的穿透问题 MyPromise().then().then().then(res =&gt; &#123; console.log(res); &#125;);*/ return value; &#125;; onRejectd = typeof onRejectd === 'function' ? onRejectd : function (reason) &#123; throw reason; &#125;; if (self.status === 'fulfilled') &#123; return promise2 = new MyPromise(function (resolve, reject) &#123; // 异步调用 setTimeout(() =&gt; &#123; try &#123; var x = onResolve(self.data); resolvePromise(promise2, x, resolve, reject); &#125; catch (reason) &#123; reject(reason); &#125; &#125;); &#125;); &#125; if (self.status === 'reject') &#123; return promise2 = new MyPromise(function (resolve, reject) &#123; setTimeout(() =&gt; &#123; try &#123; var x = onRejectd(self.data); resolvePromise(promise2, x, resolve, reject); &#125; catch (reason) &#123; reject(reason); &#125; &#125;); &#125;); &#125; // 当pending时，不能确定调用 onResolve,还是 onRejectd if (self.status === 'pending') &#123; return promise2 = new MyPromise(function (resolve, reject) &#123; self.onResolvedCallback.push(function (value) &#123; try &#123; var x = onResolve(value); resolvePromise(promise2, x, resolve, reject); &#125; catch (r) &#123; reject(r); &#125; &#125;); self.onRejectdCallback.push(function (reason) &#123; try &#123; var x = onRejectd(reason); resolvePromise(promise2, x, resolve, reject); &#125; catch (e) &#123; reject(e); &#125; &#125;); &#125;); &#125;&#125;;MyPromise.prototype.catch = function (onRejectd) &#123; return this.then(null, onRejectd);&#125;; 测试 promise12npm i -g promises-aplus-testspromises-aplus-tests Promise.js]]></content>
+      <tags>
+        <tag>js</tag>
+        <tag>promise</tag>
+        <tag>es6</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[源码阅读学到的新知识]]></title>
+    <url>%2F2018%2F03%2F24%2Fsource-code%2F</url>
+    <content type="text"><![CDATA[123456789101112131415161718192021222324252627282930313233343536// 将b的方法复制到afunction merge (a, b)&#123; if (a &amp;&amp; b) &#123; for (var key in b) &#123; a[key] = b[key]; &#125; &#125; return a;&#125;;// 链式调用function My() &#123; this.sum = 0;&#125;My.prototype.add = function (a, b) &#123; this.sum = a + b; return this;&#125;;My.prototype.sub = function (b, c) &#123; this.sum -= b + c; return this;&#125;;var my = new My();console.log(my.add(1, 6).sub(3, 4).sum);// 不调用new 实例化function Person(options) &#123; if(!(this instanceof Person))&#123; return new Person(options) &#125;&#125;]]></content>
+      <categories>
+        <category>js</category>
+      </categories>
+      <tags>
+        <tag>js</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[express 中间件原理及实现]]></title>
+    <url>%2F2018%2F03%2F23%2Fexpress-middleware%2F</url>
+    <content type="text"><![CDATA[中间件的使用案例123456const express = require('express');const app = express();app.use(function(req,res,next) &#123; next()&#125;) 以上是最简单的例子。一个中间件就是一个函数，参数为req,res,next。在这个函数中，必须执行next函数或者发送响应，否者服务会被挂起，客户端会一直处于等待。 为什么要使用中间件在中间件中可以处理req、res对象，给他们增加新的方法和属性，供下一个中间件调用，还可以通过next控制权限，提前中断后续中间件的调用。这样的话就可以将应用的功能拆分出来，实现功能的解耦。 中间件的原理是什么像connect内部维护了一个数组，执行app.use会往这个数组中增加一个中间件。当接收到一个请求时，如果中间件执行了next()，会依次往下执行。 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152var http = require('http');function express() &#123; var stack = []; // 中间件函数数组 function app(req, res) &#123; var i = 0; function next() &#123; var handler = stack[i++]; if (!handler) &#123; return; &#125; // 中间件函数调用,如果调用了next,相当于递归调用，下一个中间件函数就会执行 handler(req, res, next); &#125; next(); &#125; // 增加中间件 app.use = function (middleware) &#123; stack.push(middleware); &#125;; return app;&#125;var app = express();http.createServer(app).listen(3000);app.use(function (req, res, next) &#123; console.log('start1'); next(); console.log('next1');&#125;);app.use(function (req, res, next) &#123; console.log('start2'); next(); console.log('next2');&#125;);app.use(function (req, res) &#123; console.log('start3');&#125;);// 打印结果// start1// start2// start3// next2// next1 注意，这里用了两个闭包，一个维护stack中间件数组，一个维护中间件函数下标i。前面看的是express3,后面看了express4源码。 express 不使用 connect 管理中间件了。一个中间件包含一个route 属性，当一个请求进来时,循环所有的中间件，next(router) 提前退出,没有定义路由的提前退出，路径不匹配的提前退出。 Route 有 stack 数组，里面都是 Layer 实例，在解析中间件时，Layer 将路由路径转化为正则表达式，并将参数解析，放到他自己本身的属性上，在循环中间件时，req 对象上合并 Layer的 params 属性。在Route.process_params回调中调用 Layer.handle_request 执行中间件函数。]]></content>
+      <categories>
+        <category>node</category>
+      </categories>
+      <tags>
+        <tag>node</tag>
+        <tag>express</tag>
+        <tag>middleware</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[jetbrain开发工具webstorm、phpstorm设置同步]]></title>
+    <url>%2F2018%2F03%2F19%2Fjetbrain-setting%2F</url>
+    <content type="text"><![CDATA[开发使用jetbrain开发工具，经常会改动配置文件，比如：修改快捷键、代码段、文件模板等，需要同步公司和个人电脑的配置。最开始使用的是Dropbox同步配置文件，每次改动都需要导出，然后每个编辑器再导入，非常麻烦，效率很低。今天发现webstrom等自动设置同步插件，只有设置一个同步仓库，每次IDE启动、退出时默认同步配置，非常的方便。 这个插件的名字 settings repository,一般自带这个插件，没有的话到插件中心下载就好了。这个是详细的介绍地址 Settings Repository]]></content>
+      <tags>
+        <tag>editor</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[javascript事件循环]]></title>
+    <url>%2F2018%2F03%2F19%2Fjavascript-event-loop%2F</url>
+    <content type="text"><![CDATA[进程和线程了解进程和线程，更好的理解js单线程。 官方术语 进程是cpu资源（包括内存等）分配的最小单元(是能拥有资源和独立运行的最小单元)。 线程是cpu调度的最小单元。 cpu资源包括什么??这里的调度的意思是什么?? 网络上看到很多次的比喻： 将进程比作一个工厂，工厂和工厂直接互不影响。工厂里面有很多工人，工人相当于线程，工厂里面的电力等资源工人都可以使用，一个或多个工人合作完成任务。 从上面可以得出： 进程之间互不影响 一个进程包含一个或多个线程 同一个进程中的线程共享资源 浏览器的进程和线程首先浏览器是多进程的，可以打开谷歌浏览器的任务管理器查看。基本上一个标签页就是一个进程，一个插件也是一个进程，但是多个空白标签页合并为一个进程，浏览器做了优化。多进程的好处是什么呢？当一个标签页或者插件崩溃了，并不会影响到其他的进程，如果是单进程的话，只要有一个崩溃的话会影响整个浏览器。多进程充分利用多核优势。 多进程为什么可以充分利用多核优势?? 浏览器包含的进程Browser进程：浏览器的主进程,只要一个，负责主控和协调。主要的作用跟整个浏览器相关的： 浏览器的界面与用户的交互 负责各个页面的管理，创建和销毁其他进程 网络资源的管理和下载 负责将Renderer进程内存里的Bitmap绘制成界面 o(╥﹏╥)o不懂啥意思 第三方插件进程：这个比较容易理解，一个插件一个进程，仅当插件启用时才会被创建。 GPU进程：最多一个，用于3D绘制。 什么是GPU？？ Renderer进程：浏览器渲染进程，默认每个Tab页面一个进程，互不影响。 Renderer进程是多线程的，主要作用为页面渲染、脚本执行、事件处理等。 Renderer进程包含的线程Renderer进程是前端关注的重点，主要包括GUI渲染线程、JS引擎线程、事件触发线程、定时器触发线程、ajax网络请求线程等。 GUI渲染线程主要负责： HTML、CSS解析，构建DOM树和RenderObject树，布局和绘制 当发生Repaint或者reflow时，该线程就是执行 GUI渲染线程和JS引擎线程是互斥的，这两个线程同时只有一个线程运行 JS引擎线程主要作用： 负责执行javascript脚本 等待任务队列的任务触发，一个Renderer进程只有一个JS线程在运行JS程序。 JS引擎线程和GUI渲染线程是互斥的 事件触发线程主要作用： 用来控制事件循环 当JS引擎执行setTimeout、发送Ajax，绑定事件响应等，会将对应的任务添加到该线程 当对应的事件符合触发条件时，该线程会把事件添加到任务队列的末尾，等待JS引擎空闲时执行。 定时器触发线程： setTimeout 和setInterval所在线程 因为JS是单线程的，如果处于阻塞线程状态，会影响计时的准确性，所以另开线程。 计时完毕后，会将事件添加到任务队列的末尾，等待JS引擎空闲时执行。 ajax网络请求线程: 在XMLHttpRequest请求连接成功后，浏览器新开一个线程请求 在状态请求状态变更时，会产生状态变更事件，将回调函数放在任务队列的末尾，等待JS引擎空闲时执行。 js为什么是单线程其实这与它的用途有关。作为浏览器脚本语言，JavaScript 的主要用途是与用户互动，以及操作 DOM。若以多线程的方式操作这些 DOM，则可能出现操作的冲突。假设有两个线程同时操作一个 DOM 元素，线程 1 要求浏览器删除 DOM，而线程 2 却要求修改 DOM 样式，这时浏览器就无法决定采用哪个线程的操作。当然，我们可以为浏览器引入“锁”的机制来解决这些冲突，但这会大大提高复杂性，所以 JavaScript 从诞生开始就选择了单线程执行。 setTimeout 只是将事件插入到task queue,必须等到execution context stack(执行栈) 执行完成,主线程才会去执行指定的回调函数。所以当程序耗时很长时，并不能保证setTimeout能够在指定时间执行。比如：123456setTimeout(()=&gt;&#123; console.log('start');&#125;,0)for (let i = 0; i &lt; 100000; i++) &#123; console.log(i);&#125; 并不能保证在0 ms 之后打印 start并且setTimeout最短间隔不得低于 4ms，低于这个值会自动增加。setTimeout(fn,0)的意思是让fn在主线程最早有空闲的时候执行。在vue中，数据的改变并不会马上触发Dom元素的更新，需要使用$nextTick或者setTimeout(fn,0),保证可以获取到更新后的DOM元素 nodejs中的event-loop1234567891011121314151617console.log(1);setTimeout(() =&gt; &#123; console.log(2);&#125;, 0);console.log(4);process.nextTick(() =&gt; &#123; console.log(5); process.nextTick(() =&gt; &#123; console.log(6); &#125;);&#125;);setTimeout(() =&gt; &#123; console.log(7);&#125;, 0);setImmediate(() =&gt; &#123; console.log(8);&#125;, 0);]]></content>
+      <tags>
+        <tag>js</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[js中引用和值]]></title>
+    <url>%2F2018%2F02%2F27%2Freference-or-value-javascript%2F</url>
+    <content type="text"><![CDATA[今天在网上看到一篇文章JavaScript数据操作–原始值和引用值的操作本质,我觉得写得很好，刚好学习一下，补补漏。 原始值不管是赋值还是函数参数传递，都不会改变原值，引用值不管是赋值还是函数参数传递，只要新变量被覆盖，就不会影响原值，如果是对新变量直接修改，就会改变原值。 这句话怎么理解呢？我是这么理解的：原始值是值得复制，将原始值复制给了一个新的变量。引用值呢，只要新变量和引用值之间的引用关系断掉了，那么新变量的改变不会影响原值，因为操作的不是同一个地址中的数据呀。什么情况会造成引用关系断掉呢？就是给新变量赋了一个新的值。]]></content>
+      <categories>
+        <category>js</category>
+      </categories>
+  </entry>
+  <entry>
+    <title><![CDATA[webhooks实现hexo自动部署]]></title>
+    <url>%2F2018%2F02%2F25%2Fgit%2Bwebhooks-deploy%2F</url>
+    <content type="text"><![CDATA[以前博客通过github page搭建的，访问速度不快，就想着搭建在自己的服务器上。虽然服务器只是 1 核 1 G 的，但是还是能跑很多应用的。 nginx配置博客设置了3个域名访问，配置如下：/etc/nginx/conf.d/blog.conf 12345678server&#123; listen 80; server_name www.ltinyho.top blog.ltinyho.top ltinyho.top; root /home/ltinyho/project/ltinyho.blog.io; location / &#123; index index.html; &#125;&#125; sudo nginx -s reload 成功访问 本来想用docker-compose 启动nginx服务的，但是出现nginx出现connet fail 111错误，应该是docker网络的问题，一时搞不定。待以后好好学习下docker。 启动webhook服务基本思路就是hexo deploy时，生成的静态网站会push代码到博客仓库，触发webhook，调用配置的wehook url，执行git pull，拉取最新的代码。 碰到的问题我的代码仓库是放在mac的移动硬盘上的，创建的脚本文件默认有777的权限，而且用chmod不能更改，但是在服务器上的脚本没有执行权限。解决方法是在mac的系统盘上增加脚本的执行权限。 其中webhook服务我是用docker跑的，但是在docker里面不能执行宿主机的脚本。看到过一种解决方案，使用ssh登录宿主机，然后执行脚本。我的方案是启动了一个deploy服务，然后请求这个服务执行对应的脚本。注意，这个deploy服务不能使用docker跑，要不然还是一样不能执行宿主机的脚本。我使用pm2启动deploy服务，执行对应的脚本。注意设置pm2启动的服务开机自启动。]]></content>
+      <tags>
+        <tag>git</tag>
+        <tag>webhooks</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[技术驱动]]></title>
+    <url>%2F2017%2F12%2F20%2Ftechnology-driven%2F</url>
+    <content type="text"><![CDATA[今天在gitchat上看的一篇文章，(从工程师到技术管理，我和研发团队如何在9个月内实现逆袭)[http://gitbook.cn/books/59007357ff8adf3464a00028/index.html]。里面谈到很多关于团队和个人发展的问题。作者作为一个空降领导，如何融入团队，了解团队工作、团队成员，推动项目的进行，为下属争取晋升和利益。将团队打造成利益共同体，统一团队目标。从繁杂的琐碎的业务工作抽身出来，将更多的时间放在研发上，技术推动业务的发展。 文章中提到技术驱动，作者的观点是： 首先，所有的公司从根本上都是业务驱动的，我们看到的技术驱动是因为其业务本身就是技术。正因如此，研发团队需要认清自己的定位，从一般意义上的需求实现者转变为业务的合作伙伴——要关注业务的运营。而这个定位也要明晰研发（或技术）所具备的优势，而这些优势不但可以预防业务过度关注短期利益而损害长期的机会，而且可以帮助业务构筑效率和新模式上的竞争优势，从这个角度，技术可以反推业务前进，实现驱动力。 特别赞同从业务的实现者转为业务的合作者。 作者还提到研发的优势在于工具、数据和模型，可以将优势应用于业务和研发自身，包括： 提供工具简化操作 提供自动化，提高业务效率 通过数据发现问题和机遇，为业务决策和优化提供依据。 通过模型和工具使决策本身自动化 上面一、二两点对我来说比较好理解，三、四两点没有太大的概念和手段。 总结什么是优秀技术管理者最需要关注的呢？我觉得是成事的能力，而这种能力中，除去一定的技术能力外，情商和做事方法是至关重要的方面。技术管理者需要建立起业务和研发的高效生产和反馈闭环，在实践中，不但要将自己和团队的定位从需求实现者转变为业务的合作伙伴，更甚至成为亚马逊那样的客户至上的践行者。技术管理者要建立良好的服务意识并长期关注效率。 不同的企业文化和制度中，有些严格，它们强调帮助个体明确目标、限制惰性，或激发个体的内在驱动力，而有些则更为舒适，期望给创造性的工作一个宽松的环境。做为技术管理者，必须担负起人员培养的责任，为了帮助团队成员成长，适当挑战甚至严格要求是必须的，甚至有时出于对团队和当事人负责，迅速解决能力不适合的团队成员也是必须的。尤其对于后者，有些敏捷教练的那种不抛弃不放弃的鸡汤文化真是相当幼稚。《从优秀到卓越》就严格有很好的论述，而网上很多探讨“严格是大爱”的文章写得也很到位。总的来说，优秀的技术管理者对于严格的看法，要有”以雷霆手段，显菩萨心肠“的觉悟。]]></content>
+      <categories>
+        <category>book</category>
+      </categories>
+      <tags>
+        <tag>think</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[js data stuct]]></title>
+    <url>%2F2017%2F12%2F18%2Fdata-stuct%2F</url>
+    <content type="text"><![CDATA[stackdequeuepriority-queue优先队列123456789101112let isAdded = falsefor(let i=0;i&lt;queue.length;i++)&#123; if(element.priority&lt; queue[i].priority)&#123; items.splice(i,0,element) isAdded = true break &#125;&#125;if(!isAdded)&#123; items.push(element)&#125; circular-queue循环队列 1queue.enqueue(queue.dequeue)]]></content>
+      <tags>
+        <tag>css</tag>
+        <tag>flex</tag>
+        <tag>layout</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[风险 投资 劳动]]></title>
+    <url>%2F2017%2F12%2F17%2Frisk-invest-work%2F</url>
+    <content type="text"><![CDATA[今天在知乎上看到一篇文章里面提到对收入的影响,风险 &gt; 资本 &gt; 劳动。 风险投资行业风险最高的天使轮投资,为idea买单,当然成功收益也很高。这个需要资本。 资本资本，通过资本收益，比如：房租，利息等被动收入。创办公司，自己当老板。 劳动劳动，需要掌握一定的技能，通过出售自己的技能，时间来获得收入。当然，这种风险是较小的。公司的大部分收入是员工来创造的，但是公司老板的收入是最高的。当企业经营不善时，员工是没有任何风险的，大不了公司倒闭换个公司继续工作，而老板承担的风险是最高的，他的资本投入都会赔掉。 总结通过劳动实现财富的原始积累，通过资本的被动收入实现财务自由。]]></content>
+  </entry>
+  <entry>
+    <title><![CDATA[保持学习]]></title>
+    <url>%2F2017%2F12%2F17%2Fkeep-study%2F</url>
+    <content type="text"><![CDATA[今天看了gitchat上的文章，做做笔记。 文章： 不走弯路的五大学习策略 升职加薪：8小时之外的人生 学习的三个维度 学习 = 学 + 习 学是容易获得成就感的，实践相对来说更枯燥一些，光学不练的学习都是假学习。 学习 = 动机 + 内容 + 交互 增强动机学习之前先思考一下： 为什么学呀 学了可以干啥 不学会怎样啊 动力不足的话可以先YY一下，学成之后的情景。这样可以增强自己的冬季，也可以避免盲目的学习。 精选内容「N 手知识」概念？ 一手知识来自于一线专家，通过和他们交流，或者读他们的论文来学习。 二手知识是发明某个理论的专家亲自写的书。 三手知识是其他人读了专家的书之后翻译成大家都能懂的语言的畅销书，或者培训师通过故事案例来传递的知识。 四手知识是某些人为了实现某种目的而写的免费文章，常常断章取义。 要看自己更容易消化哪种知识，在不同的阶段，是不一样的。 适合自己的知识才是最好的 联机交互在完成知识的原始积累的情况下，跟他人讨论学习。 学习的效率 效率 = 收益 / 资源 高效学习，不是指高效率学习，也不是快速学习，而是高效益。学习的效益等于获得收益除以投入的资源（时间、金钱、精力）。 放大收益学习做产品，把自己的能力包装成产品，卖给更多的人，卖的更贵。 学习一下写作、演讲和培训通用的技能，不管的那个领域的知识，都可以通过写作、演讲和培训来放大收益。 匹配资源针对不同的学习材料，需要投入的时间和精力是不一样的。学习材料分级：认知型，知识型，娱乐型。 认知型 适合精力充沛时花整段的时间来学习的知识，比如：编程、数学、英语 知识型 适合精力较好，碎片化的时间，阅读一些知识型的材料，比如：产品、消费者心理学 娱乐型 适合饭后，晚上精力比较差，时间也比较碎时浏览的内容，比如：社交媒体、博客订阅 总结增强动机： 列举正在学习的一项技能的愿景、价值和规条 列举兴趣清单 记录问题清单 精选内容： 尝试读一篇论文 找到编程领域的知识源头 联机交互： 梳理联机学习者清单 尝试组织或参加一次私董会 加入 1 个学习社群 放大收益： 开始写文章发布到简书 列举输出渠道清单 发布一场 GitChat 匹配资源： 明天尝试早起学习 将书架上的书分成认知型、知识型、娱乐型三类 8小时之外如何成长： 端正自己的心态，学到的都是自己的，好相处 知其然，更要知其所以然，工作可以先完成，后面还是要搞懂为什么 主动发现问题并解决 跟上公司的发展，提前学习]]></content>
+      <tags>
+        <tag>study</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[解决单页面应用微信浏览器后台加载视频]]></title>
+    <url>%2F2017%2F12%2F17%2Fstop-wechat-video-load%2F</url>
+    <content type="text"><![CDATA[好久没写东西啦，懒癌犯了。。。 问题单页面应用，用户使用wifi打开过一个视频后，即使销毁了video，甚至播放页面都关闭的情况下，微信浏览器仍然会在后台继续加载视频，这会浪费很多流量。最开始以为使用销毁vidoe标签后，视频即会停止加载，事实上在大部分浏览器上确实如此，但是微信内置浏览器在这方面表现不一致。在使用流量的情况下，退出播放页面后视频确实停止加载了，但是在wifi下，视频会在后台继续下载，除非退出当前单页面应用。 解决问题 1、最开始在组件 destroy 的 hook 时，dispose videojs 实例，无效，视频继续后台下载。 2、后来想让videojs 加载一个空的视频资源地址欺骗微信浏览器，videojs.src(&quot;&quot;)，无效，视频还是会继续加载。 3、 空的字符串不生效，加载一个无效的视频资源地址，再销毁videojs实例，成功解决视频后台下载的问题。 主要代码如下: 1234567891011destroyed() &#123; // 组件销毁时,用一个假的播放视频地址,欺骗微信浏览器,使其加载其他的视频,不继续加载我们的视频同时销毁videojs this.player.src(&#123; src: "http://124.160.184.108/live/5/45/3bfabc1fe16a4282b50ea095928c1f60.m3u8", type: 'application/x-mpegURL', withCredentials: false &#125;) setTimeout(()=&gt;&#123; this.player.dispose() &#125;,1500) &#125;]]></content>
+      <categories>
+        <category>折腾</category>
+      </categories>
+      <tags>
+        <tag>wechat</tag>
+        <tag>videojs</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[vue仿app启动页]]></title>
+    <url>%2F2017%2F09%2F16%2Fvue-start-page%2F</url>
+    <content type="text"><![CDATA[用vue开发的webapp，在性能差的android微信首屏加载时间过长，模拟app启动页减少用户的等待时间过长的感觉。 实现思路通过sessionStorage存储项目是否被加载过,只在第一次加载显示启动页，在跳出外链回来时不再显示启动页。主要实现的方案： index.html入口文件 1&lt;div id="app"&gt;&lt;/div&gt; 1234567891011121314151617181920if (!sessionStorage.getItem('isLoaded')) &#123; var app = document.getElementById('app') var loadingStr = '数据加载中' app.innerHTML = '&lt;a id="img_wrap" href=""&gt;&lt;img id="start_img" src="./static/start-img-2.gif"&gt;&lt;span id="count"&gt;&lt;i id="count_num"&gt;2&lt;/i&gt; S&lt;/span&gt;&lt;/a&gt;' var TIME = 2 // 倒计时 var countNum = document.getElementById('count_num') var timer = setInterval(function () &#123; if (TIME &gt;= 1) &#123; countNum.innerText = --TIME &#125; else &#123; clearInterval(timer) app.innerHTML = loadingStr // 防止倒计时结束vue还没挂载 &#125; &#125;, 1000) // 解决点击后没有挂载 document.getElementById('img_wrap').addEventListener('click',function (e) &#123; sessionStorage.setItem('isLoaded', true) &#125;)&#125; main.js 1234567891011121314151617181920const mounted = function () &#123; return function () &#123; new Vue(&#123; el: '#app', router, store, template: '&lt;App/&gt;', components: &#123; App &#125; &#125;) &#125;&#125;()if (sessionStorage.getItem('isLoaded')) &#123; mounted()&#125; else &#123; setTimeout(() =&gt; &#123; mounted() sessionStorage.setItem('isLoaded', true) &#125;, 2000)&#125; 以上实现方法是比较简单的，如果要对iphone加载快的设备不显示启动页的话只需加个设备判断。]]></content>
+      <categories>
+        <category>折腾</category>
+      </categories>
+      <tags>
+        <tag>js</tag>
+        <tag>vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[swiper使用中问题汇总]]></title>
+    <url>%2F2017%2F09%2F16%2Fswiper-use%2F</url>
+    <content type="text"><![CDATA[swiper中文官网swiper英文官网 在开发中经常要用到轮播图插件，swiper官方文档全，功能强大，但在使用中有一些问题，在此记录。 swiper被隐藏后slider的索引被初始化可以将隐藏改为高度为0，这样就不会触发初始化了。或者再显示时调用mySwiper.slideTo(index, speed, runCallbacks)文档中有个observer选项，但是并没有生效。 启动动态检查器(OB/观众/观看者)，当改变swiper的样式（例如隐藏/显示）或者修改swiper的子元素时，自动初始化swiper。默认false，不开启，可以使用update()方法更新。 vue-awesome-swiper 循环较多时会很卡参考vue2+vue-router 在loop下会刷新页面的问题 由于swiper官方并未修复loop模式下附带的一些bug，此问题的解决方法，只能由手动控制点击事件，即为组件绑定点击事件方法，事件发生时获取当前活动状态的slide组建的下标，进行既定操作，此问题暂时关闭。 要自己手动触发切换，同时并且要使用v-once，绑定`@click.native`事件123456 &lt;swiper v-once :options=&quot;swiperOption&quot; ref=&quot;mySwiper&quot; class=&quot;lesson-lists&quot;&gt; &lt;swiper-slide v-for=&quot;(_item,index) in items&quot;:key=&quot;_item.id&quot; @click.native=&quot;study(_item),slideTo(index)&quot;&gt; &lt;!--内容--&gt; &lt;/swiper-slide&gt;&lt;/swiper&gt;]]></content>
+      <tags>
+        <tag>js</tag>
+        <tag>swiper</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[通过git安装npm私有模块]]></title>
+    <url>%2F2017%2F09%2F11%2Fnpm-private-package-via-git%2F</url>
+    <content type="text"><![CDATA[需求分析在日常项目中，会有几个项目共同的组件或者工具函数库。这些代码如果在各个项目中都copy一份的话，如果有需要改动的话，oh，要累死去。本着DPR的原则，需要一种可以管理公用代码的方法。并且代码中有些是公司内部业务逻辑，这肯定不能发布成公用包。所以需要一种私有包管理方案。 可选方案 1、npm官方私有包，需要收费，pass 2、搭建npm私有服务器，还没有这个必要，pass 3、使用 npm 安装 git 仓库 简单便利 4、使用 git 的 submodule，在主仓库中嵌套子仓库 npm 安装 git 仓库因为github私有仓库需要收费，这里我使用码云创建免费私有 git仓库。在项目中直接 npm 安装私有仓库，示例：1npm install git+ssh://git@github.com:ltinyho/test.git 可以使用npm install --help查看install命令(npm@5.3.0) 12345678910npm install (with no args, in package dir)npm install [&lt;@scope&gt;/]&lt;pkg&gt;npm install [&lt;@scope&gt;/]&lt;pkg&gt;@&lt;tag&gt;npm install [&lt;@scope&gt;/]&lt;pkg&gt;@&lt;version&gt;npm install [&lt;@scope&gt;/]&lt;pkg&gt;@&lt;version range&gt;npm install &lt;folder&gt;npm install &lt;tarball file&gt;npm install &lt;tarball url&gt;npm install &lt;git:// url&gt;npm install &lt;github username&gt;/&lt;github project&gt; 从git安装可以选择标签|分支|commit，最好更该代码后修改仓库中package.json版本信息1npm install &lt;github username&gt;/&lt;github project&gt;#&lt;tag|branch|commit&gt; git submodule 仓库嵌套12git submodule add &lt;仓库地址&gt; &lt;文件路径&gt;在项目根目录生成`.gitmodules`文件，记录子模块的信息 新项目安装或者更新12git submodule init git submodule update]]></content>
+      <categories>
+        <category>折腾</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+        <tag>npm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[cmder 别名设置和自定义cmder启动界面]]></title>
+    <url>%2F2017%2F07%2F22%2Fcmder-config-start-ui%2F</url>
+    <content type="text"><![CDATA[在window下开发，自带的cmd不好用，所以在网上搜索到cmder。cmder挺好用的，但我有两点需求没设置好： 1、别名设置 2、启动界面自定义 先放官网，cmder，其他的详细介绍网上有很多了。 一、别名设置先介绍一下我使用的环境，我用是win10+gitbash，在设置别名的时候不生效，我也查了很多，老版本的别名设置是写在config/aliases,我使用的版本是1.3.2，别名设置写在config/user-aliases.cmd,但是我的设置不生效，查了很多，目前实现的方法是在gibash安装目录etc/bash.bashrc中加入设置，这个是gitbash设置的别名。 123456789101112131415//bash.bashrc#打开当前文件夹alias e.=&apos;explorer .&apos;alias ls=&apos;ls --show-control-chars -F --color $*&apos;alias clear=clsalias gl=&apos;git pull origin $1&apos;alias glm=&apos;git pull origin master&apos;alias gp=&apos;git push origin $1&apos;alias gpm=&apos;git push origin master&apos;alias cpd=&apos;cap production deploy&apos;alias cpt=&apos;cap staging deploy&apos;# 设置使用webstorm打开文件，空格要使用&apos;\&apos;转义一下alias wb=&apos;C:/Program\ Files/JetBrains/WebStorm\ 2017.1.4/bin/webstorm64.exe $1&apos; 重启cmder，alias设置生效了，哈哈。 二、启动界面设置因为开发的目录特别多，每天都要重复打开开发目录。 一共8个目录，如果每次都要打开8个tab，还要进入不同的目录，简直要累死。为了解决这个问题，打开cmder设置。 1、先设置为自动，建好你需要设置的布局，重启cmder。 2、将第三部份的配置保存在一个txt的文件中 3、将设置改为tasks file启动，注意要在txt文件中改掉每个bash启动的目录。 大功告成。 2017年09月12日 更新了下window，window将cmd改成powershell了，不喜欢，将系统换成ubuntu]]></content>
+      <categories>
+        <category>折腾</category>
+      </categories>
+      <tags>
+        <tag>cmder</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[css两栏布局、圣杯布局、双飞翼布局]]></title>
+    <url>%2F2017%2F06%2F25%2Fcss-layout%2F</url>
+    <content type="text"><![CDATA[最近几个月一直用vue在写手机端的项目，主要写业务逻辑，在js方面投入的时间和精力也比较多。这两天写页面明显感觉css布局方面的知识有不足，所以复习一下布局方法。 两栏布局 1、浮动 1234567891011.box1 .left &#123; float: left; width: 100px; height: 100px; background-color: red; &#125; .box1 .right &#123; margin-left: 100px; height: 100px; background-color: green; &#125; 1234&lt;div class="box1"&gt; &lt;div class="left"&gt;&lt;/div&gt; &lt;div class="right"&gt;两列自适应&lt;/div&gt;&lt;/div&gt; 2、定位 123456789101112131415161718.box1&#123; position: relative; width: 100%; height: 100px; &#125; .box1 .left&#123; position: absolute; width: 100px; height: 100%; background-color: red; &#125; .box1 .right&#123; margin-left: 100px; width: 100%; height: 100%; background-color: green; &#125; 1234&lt;div class="box1"&gt; &lt;div class="left"&gt;&lt;/div&gt; &lt;div class="right"&gt;&lt;/div&gt;&lt;/div&gt; 3、flex 123456789101112131415.box1&#123; display: flex; height: 100px;&#125;.box1 .left&#123; width: 100px; height: 100%; background-color: red;&#125;.box1 .right&#123; flex:1; height: 100%; background-color: green;&#125; 1234&lt;div class="box1"&gt; &lt;div class="left"&gt;&lt;/div&gt; &lt;div class="right"&gt;&lt;/div&gt;&lt;/div&gt; 圣杯布局和双飞翼布局目的是我们希望先加载的是中间的部分，然后再开始加载 left 和 right 两个相对来说不是很重要的东西。 圣杯布局圣杯布局给最外面加padding, 让 padding-left 和 padding-right 的数值等于left 和 right 的宽度，然后利用相对定位把他们再移动在两旁。12345678910111213141516171819202122232425262728.box&#123; padding: 0 100px;/* 留出左右的距离*/ height: 100px; &#125; .box .middle &#123; float: left; width: 100%; height: 100%; background-color: yellow; &#125; .box .left &#123; float: left; width: 100px; margin-left: -100%; background-color: red; position: relative; left: -100px;/*往左拉*/ height: 100%; &#125; .box .right &#123; float: left; width: 100px; margin-left: -100px; background-color: green; position: relative; right: -100px; height:100%; &#125; 123456&lt;div class="box"&gt; &lt;!--注意顺序--&gt; &lt;div class="middle"&gt;middle&lt;/div&gt; &lt;div class="left"&gt;left&lt;/div&gt; &lt;div class="right"&gt;right&lt;/div&gt;&lt;/div&gt; 双飞翼布局1234567891011121314151617181920212223242526272829.box &#123; position: relative; height: 100px; &#125; .middle-wrap &#123; position: relative; float: left; width: 100%; height: 100%; &#125; .middle-wrap .middle &#123; height: 100%; margin: 0 100px; /*留出距离*/ background-color: yellow; &#125; .left &#123; float: left; width: 100px; margin-left: -100%; height: 100%; background-color: red; &#125; .right &#123; float: left; width: 100px; height: 100%; margin-left: -100px; background-color: green; &#125; 1234567&lt;div class="box"&gt; &lt;div class="middle-wrap"&gt; &lt;div class="middle"&gt;&lt;/div&gt; &lt;/div&gt; &lt;div class="left"&gt;&lt;/div&gt; &lt;div class="right"&gt;&lt;/div&gt;&lt;/div&gt;]]></content>
+      <tags>
+        <tag>css</tag>
+        <tag>flex</tag>
+        <tag>layout</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[vue-cli配置webpack dll]]></title>
+    <url>%2F2017%2F06%2F15%2Fvue-config-webpack-dll%2F</url>
+    <content type="text"><![CDATA[问题在前端项目中，我们希望第三方库（vendors）和自己写的代码可以分开打包，vue-cli也帮我们配好了webpack的CommonsChunkPlugin，但是在使用vue-cli的打包的过程中有一些痛点。 一、verdors缓存失效改变了app.js的一点儿代码，verdors打包的chunkhash就会改变,导致每次发布，vendors的缓存都会失效。这样增加了用户的流量消耗和首屏加载时间。 二、项目打包时间过长 在公司的台式机打包一次要花费30s，在个人笔记本上则需要花费40s之多。 为了解决上述问题，在网上查找资料后，找到使用 webpack dll这个方案。 解决过程### 一、编写dll配置文件 先贴上我的webpack.dll.conf.js配置代码123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475var path = require('path');var webpack = require('webpack');var config = require('../config')var ExtractTextPlugin = require('extract-text-webpack-plugin'); // 提取cssvar AssetsPlugin = require('assets-webpack-plugin'); // 生成文件名，配合HtmlWebpackPlugin增加打包后dll的缓存module.exports = &#123; entry: &#123; libs: [ 'vue/dist/vue.esm.js', 'vue-router', 'vue-infinite-scroll', 'vue-cookie', 'vuex', 'jquery', 'iscroll', 'weui.js', 'video.js', 'babel-polyfill', 'resetcss', 'font-awesome/css/font-awesome.min.css', 'video.js/dist/video-js.min.css', 'element-ui', 'element-ui/lib/theme-default/index.css', ] &#125;, output: &#123; path: path.resolve(__dirname, '../public'), filename: '[name].[chunkhash:7].js', library: '[name]_library' &#125;, plugins: [ new webpack.DllPlugin(&#123; path: path.resolve(__dirname, '../public/[name]-mainfest.json'), name: '[name]_library', context: __dirname // 执行的上下文环境，对之后DllReferencePlugin有用 &#125;), new ExtractTextPlugin('[name].[contenthash:7].css'), new webpack.optimize.UglifyJsPlugin(&#123; compress: &#123; warnings: false &#125;, &#125;), new AssetsPlugin(&#123; filename: 'bundle-config.json', path: './public' &#125;), ], module: &#123; rules: [ &#123; test: /\.css$/, use: ExtractTextPlugin.extract(&#123; fallback: "style-loader", use: "css-loader" &#125;) &#125;, &#123; test: /\.(png|jpe?g|gif|svg)(\?.*)?$/, loader: 'url-loader', query: &#123; limit: 10000, name: 'img/[name].[hash:7].[ext]' &#125; &#125;, &#123; test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/, loader: 'url-loader', query: &#123; limit: 10000, name: 'fonts/[name].[hash:7].[ext]' &#125; &#125; ] &#125;,&#125; 1、entry配置需要dll打包的库 2、module配置处理对应文件类型的loader 3、增加 webpack.DllPlugin插件 1、path:生成mainfest.json文件的绝对路径。mainfest.json里面的内容为所有被打包到dll.js文件模块id的映射。 2、name：webpack打包时mainfest.json包含的库的暴露出来的函数名名 3、contenxt(可选):引入manifest文件的context，默认为webpack的context 二、修改webpack.base.conf.js在webpack.base.conf.js的plugins增加 1234new webpack.DllReferencePlugin(&#123; context: __dirname, manifest: require('../public/libs-mainfest.json') // 指向生成的manifest.json &#125;), 注：上面提到通过AssetsPlugin和HtmlWebpackPlugin给打包的dll.js各dll.css增加缓存机制 AssetsPlugin生成的bundle-config.js12&#123;"libs":&#123;"js":"libs.f7d8ef0.js","css":"libs.e2245d7.css"&#125;&#125; webpack.dev.conf.js文件增加以下代码 12345678910var bundleConfig = require("../public/bundle-config.json")new HtmlWebpackPlugin(&#123; filename: 'index.html', template: 'index.html', inject: true, libJsName:bundleConfig.libs.js, libCssName:bundleConfig.libs.css, env:config.dev.env, &#125;), 在index.html引入生成的dll.js,dll.css12&lt;link rel="stylesheet" href="./public/&lt;%= htmlWebpackPlugin.options.libCssName %&gt;"&gt;&lt;script src="./public/&lt;%= htmlWebpackPlugin.options.libJsName %&gt;"&gt;&lt;/script&gt; 上面为开发环境的配置，生产环境对应修改就可以了。 增加build.dll.js文件， 12345678910111213141516171819202122232425262728293031323334var path = require('path');var utils = require('./utils')var webpack = require('webpack');var config = require('../config')var utils = require('./utils')var dllConfig = require('./webpack.dll.conf');var ExtractTextPlugin = require('extract-text-webpack-plugin');var AssetsPlugin = require('assets-webpack-plugin');var chalk = require('chalk')var rm = require('rimraf')var ora = require('ora')var spinner = ora(&#123; color: 'green', text: '正为生产环境打包dll包，耐心点，不然自动关机。。。'&#125;)spinner.start()rm(path.resolve(__dirname, '../public'), err =&gt; &#123; if (err) throw err webpack(dllConfig,function (err, stats) &#123; spinner.stop() if (err) throw err process.stdout.write(stats.toString(&#123; colors: true, modules: false, children: false, chunks: false, chunkModules: false &#125;) + '\n\n') console.log(chalk.cyan(' dll打包完成.\n')) &#125;)&#125;); 然后在package.json script中加上&quot;build:dll&quot;: &quot;node build/buildDll.js&quot; 注：开发和生产环境都要首先使用 webpack运行webpack.dll.conf.js生成dll.js, dll.css, mainfest.json文件，每次改变库文件也都需要重新执行一遍。 三、对比结果优化前笔记本上打包时间为4000ms，优化后笔记本打包时间为1800ms，同时也增加了这些库的缓存。]]></content>
+      <tags>
+        <tag>vue</tag>
+        <tag>webpack</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[vue2.0项目配置flow类型检查]]></title>
+    <url>%2F2017%2F04%2F23%2Fvue-config-flow%2F</url>
+    <content type="text"><![CDATA[在vue2.0的项目中加入flow类型检查。当前项目是用js写的，当项目越来越大，由于js弱类型的特性，相比ts(typescript)这种强类型的语言而言，后期维护会越来越困难。为了解决这个问题，决定使用flow 加入类型检查。 一、flow了解flow是fackbook公布的javascript静态类型检查器。 可以检查js中一些bug，eg：自动类型转换中出现的问题。flow官网 引用flow官网的介绍 flow is a static type checker for javascript flow初体验12345// @flowlet a:number = 2;function foo(b:tring):boolean&#123; return false;&#125; 使用bebel转换后1234let a = 2;function foo(b)&#123; return false;&#125; 从上面代码可以看出，使用flow后的代码更清晰明了。虽然使用注释也可以实现，但使用注释太繁琐，而且不直观。 二、flow的安装flow可以直接通过npm或者yarn安装。官网推荐安装方式 这里以npm为例 npm install –save-dev flow-bin 安装完成后在package.json中加入下面的脚本12345&#123;"scripts": &#123; "flow":"flow check" &#125;&#125; 同时还要安装babel编译器，将flow的类型检查代码从代码中剥离，转变成正常的js代码 npm install –save-dev babel-cli babel-preset-flow 在babel配置文件.babelrc中加入123&#123; &quot;presets&quot;: [&quot;flow&quot;]&#125; 三、flow使用配置flow 1、npm run flow init生成flow配置文件.flowconfig 官网配置传送门 我的配置文件123456789101112[ignore].*/node_modules/.*.*/test/.*.*/build/.*.*/config/.*[include][libs][options]module.file_ext=.vue module.file_ext=.js 2、新建一个文件index.js12// @flow let a:number = &apos;3&apos;; // @flow或者 /* @flow */告诉flow检查这个文件输入npm run flow 执行类型检查 注：在vue单文件组件使用flow需要额外配置 1、在.flowconfig文件的[options]中配置.vue文件扩展名1module.file_ext=.vue 2、在.vue文件中需注释掉template script styled标签参考连接： How to get Flow to properly work with Vue 2 (webpack)? Support HTML files 123456789101112131415161718192021/* @flow&lt;template&gt; &lt;div&gt; &lt;/div&gt;&lt;/template&gt;*/// &lt;script&gt; let a:string = 2; console.log(a); export default &#123; data()&#123; return &#123; &#125; &#125; &#125;// &lt;/script&gt;/*&lt;style scoped&gt;&lt;/style&gt;*/ 注意：1、 在注释template和style时使用/**/注释，在template和style内部不能再使用 /* */这种注释，这个不是flow不识别，本来就不应改/**/中嵌套/**/,应该在/**/中采用 // 注释风格2、如果不想在.vue中使用注释的方法，可以在ide中安装flow，但是不能使用npm run flow来检查了。 webstorm中配置flow配置webstorm，使其支持flow语法。官网ide配置 总结一下为3点： 1、安装node包 2、全局安装flow 3、在框架设置中选择JavaScript flow 以上是我在vue2.0项目安装flow的全部过程。 参考文章： Flow教程（一） - 简介和开始 Writing Vue.js Components with Flow]]></content>
+      <tags>
+        <tag>js</tag>
+        <tag>vue</tag>
+        <tag>flow</tag>
+      </tags>
+  </entry>
+</search>
