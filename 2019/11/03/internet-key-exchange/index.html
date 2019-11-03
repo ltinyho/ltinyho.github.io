@@ -93,13 +93,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="ltinyho&#39;s Blog">
-<meta property="og:url" content="http://blog.ltinyho.top/archives/2018/08/index.html">
+<meta name="description" content="问题:如何在不安全的网络上传送秘钥? 假设有两个人 alice 和 bob,在不安全的网络情况下,￿他们俩沟通的每一句话都会被第三方 joe 知道,如何协商出一个只有他们两个人知道的秘钥?所有的信息都会被第三方知道的情况下,通过两个人独自保密的信息,计算得到一个相同的值.需要的计算量必须非常大,使第三方即使知道沟通的内容,也很难计算得出结果. Diffie-Hellman 密钥交换协议的有效性依赖">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Diffie–Hellman 密钥交换协议">
+<meta property="og:url" content="http://blog.ltinyho.top/2019/11/03/internet-key-exchange/index.html">
 <meta property="og:site_name" content="ltinyho&#39;s Blog">
+<meta property="og:description" content="问题:如何在不安全的网络上传送秘钥? 假设有两个人 alice 和 bob,在不安全的网络情况下,￿他们俩沟通的每一句话都会被第三方 joe 知道,如何协商出一个只有他们两个人知道的秘钥?所有的信息都会被第三方知道的情况下,通过两个人独自保密的信息,计算得到一个相同的值.需要的计算量必须非常大,使第三方即使知道沟通的内容,也很难计算得出结果. Diffie-Hellman 密钥交换协议的有效性依赖">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-03T02:04:41.609Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ltinyho&#39;s Blog">
+<meta name="twitter:title" content="Diffie–Hellman 密钥交换协议">
+<meta name="twitter:description" content="问题:如何在不安全的网络上传送秘钥? 假设有两个人 alice 和 bob,在不安全的网络情况下,￿他们俩沟通的每一句话都会被第三方 joe 知道,如何协商出一个只有他们两个人知道的秘钥?所有的信息都会被第三方知道的情况下,通过两个人独自保密的信息,计算得到一个相同的值.需要的计算量必须非常大,使第三方即使知道沟通的内容,也很难计算得出结果. Diffie-Hellman 密钥交换协议的有效性依赖">
 
 
 
@@ -129,13 +133,13 @@
 
 
 
-  <link rel="canonical" href="http://blog.ltinyho.top/archives/2018/08/">
+  <link rel="canonical" href="http://blog.ltinyho.top/2019/11/03/internet-key-exchange/">
 
 
 
 
 
-  <title>归档 | ltinyho's Blog</title>
+  <title>Diffie–Hellman 密钥交换协议 | ltinyho's Blog</title>
   
 
 
@@ -154,7 +158,7 @@
     
   
 
-  <div class="container sidebar-position-right page-archive">
+  <div class="container sidebar-position-right page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
@@ -296,71 +300,163 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
-
-      <span class="archive-page-counter">
-        
-        
-         
-        
-        OK! 目前共计 39 篇日志。 继续努力。
-      </span>
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2018">2018</h1>
-          </div>
-        
-        
-
-        
 
   <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/11/03/internet-key-exchange/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/08/28/inser-file-in-vue-component/" itemprop="url">
-              
-                <span itemprop="name">vue 组件动态引入 js、css</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Diffie–Hellman 密钥交换协议</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-08-28T13:07:21+08:00" content="2018-08-28">
-          08-28
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-03T09:23:00+08:00">
+                2019-11-03
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
 
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/11/03/internet-key-exchange/" class="leancloud_visitors" data-flag-title="Diffie–Hellman 密钥交换协议">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
+      
 
+      
+        <p>问题:如何在不安全的网络上传送秘钥?</p>
+<p>假设有两个人 alice 和 bob,在不安全的网络情况下,￿他们俩沟通的每一句话都会被第三方 joe 知道,如何协商出一个只有他们两个人知道的秘钥?<br>所有的信息都会被第三方知道的情况下,通过两个人独自保密的信息,计算得到一个相同的值.需要的计算量必须非常大,使第三方即使知道沟通的内容,也很难计算得出结果.</p>
+<p>Diffie-Hellman 密钥交换协议的有效性依赖计算离散对数的难度.</p>
+<p>y=g^x mod p,在已知g,x,p的情况下,计算 y 是非常快的,但是已知 y,g,p 的情况下计算 x 的值是非常困难的.p 取很大的素数.<a href="https://flat2010.github.io/2018/04/19/%E6%A8%A1%E8%BF%90%E7%AE%97%E4%B8%AD%E4%B8%BA%E4%BD%95%E8%A6%81%E7%94%A8%E7%B4%A0%E6%95%B0%E4%BD%9C%E4%B8%BA%E6%A8%A1/" target="_blank" rel="noopener">模运算中为何要用素数作为模</a><br>秘钥交换过程:</p>
+<ul>
+<li>alice 和 bob 先协商 g,p 的值</li>
+<li>alice 私密的值 a , A=g^a mod p ,将 A 发送给 bob</li>
+<li>bob 私密的值 b, B=g^b mod p,将 B 发送给 alice</li>
+<li>alice 计算 B^a mod p = (g^b)^a mod p = g^ab mod p = S</li>
+<li>bob 计算 A^b mod p = (g^a)^b mod p = g^ab mof p = S</li>
+<li>现在 alice 和 bob 有了共同的秘钥 S,由于计算量很大,即使 joe 知道 g,p,A,B,也很难计算出 ab 的值</li>
+</ul>
+
+      
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/11/idea-git-commit-merge/" rel="next" title="idea 将多个 git commit 记录合并">
+                <i class="fa fa-chevron-left"></i> idea 将多个 git commit 记录合并
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -368,6 +464,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -595,6 +695,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
 
   
 

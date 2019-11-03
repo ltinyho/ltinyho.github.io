@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Diffie–Hellman 密钥交换协议]]></title>
+    <url>%2F2019%2F11%2F03%2Finternet-key-exchange%2F</url>
+    <content type="text"><![CDATA[问题:如何在不安全的网络上传送秘钥? 假设有两个人 alice 和 bob,在不安全的网络情况下,￿他们俩沟通的每一句话都会被第三方 joe 知道,如何协商出一个只有他们两个人知道的秘钥?所有的信息都会被第三方知道的情况下,通过两个人独自保密的信息,计算得到一个相同的值.需要的计算量必须非常大,使第三方即使知道沟通的内容,也很难计算得出结果. Diffie-Hellman 密钥交换协议的有效性依赖计算离散对数的难度. y=g^x mod p,在已知g,x,p的情况下,计算 y 是非常快的,但是已知 y,g,p 的情况下计算 x 的值是非常困难的.p 取很大的素数.模运算中为何要用素数作为模秘钥交换过程: alice 和 bob 先协商 g,p 的值 alice 私密的值 a , A=g^a mod p ,将 A 发送给 bob bob 私密的值 b, B=g^b mod p,将 B 发送给 alice alice 计算 B^a mod p = (g^b)^a mod p = g^ab mod p = S bob 计算 A^b mod p = (g^a)^b mod p = g^ab mof p = S 现在 alice 和 bob 有了共同的秘钥 S,由于计算量很大,即使 joe 知道 g,p,A,B,也很难计算出 ab 的值]]></content>
+  </entry>
+  <entry>
     <title><![CDATA[idea 将多个 git commit 记录合并]]></title>
     <url>%2F2019%2F10%2F11%2Fidea-git-commit-merge%2F</url>
     <content type="text"><![CDATA[]]></content>
@@ -208,19 +213,19 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[jetbrain开发工具webstorm、phpstorm设置同步]]></title>
-    <url>%2F2018%2F03%2F19%2Fjetbrain-setting%2F</url>
-    <content type="text"><![CDATA[开发使用jetbrain开发工具，经常会改动配置文件，比如：修改快捷键、代码段、文件模板等，需要同步公司和个人电脑的配置。最开始使用的是Dropbox同步配置文件，每次改动都需要导出，然后每个编辑器再导入，非常麻烦，效率很低。今天发现webstrom等自动设置同步插件，只有设置一个同步仓库，每次IDE启动、退出时默认同步配置，非常的方便。 这个插件的名字 settings repository,一般自带这个插件，没有的话到插件中心下载就好了。这个是详细的介绍地址 Settings Repository]]></content>
-      <tags>
-        <tag>editor</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[javascript事件循环]]></title>
     <url>%2F2018%2F03%2F19%2Fjavascript-event-loop%2F</url>
     <content type="text"><![CDATA[进程和线程了解进程和线程，更好的理解js单线程。 官方术语 进程是cpu资源（包括内存等）分配的最小单元(是能拥有资源和独立运行的最小单元)。 线程是cpu调度的最小单元。 cpu资源包括什么??这里的调度的意思是什么?? 网络上看到很多次的比喻： 将进程比作一个工厂，工厂和工厂直接互不影响。工厂里面有很多工人，工人相当于线程，工厂里面的电力等资源工人都可以使用，一个或多个工人合作完成任务。 从上面可以得出： 进程之间互不影响 一个进程包含一个或多个线程 同一个进程中的线程共享资源 浏览器的进程和线程首先浏览器是多进程的，可以打开谷歌浏览器的任务管理器查看。基本上一个标签页就是一个进程，一个插件也是一个进程，但是多个空白标签页合并为一个进程，浏览器做了优化。多进程的好处是什么呢？当一个标签页或者插件崩溃了，并不会影响到其他的进程，如果是单进程的话，只要有一个崩溃的话会影响整个浏览器。多进程充分利用多核优势。 多进程为什么可以充分利用多核优势?? 浏览器包含的进程Browser进程：浏览器的主进程,只要一个，负责主控和协调。主要的作用跟整个浏览器相关的： 浏览器的界面与用户的交互 负责各个页面的管理，创建和销毁其他进程 网络资源的管理和下载 负责将Renderer进程内存里的Bitmap绘制成界面 o(╥﹏╥)o不懂啥意思 第三方插件进程：这个比较容易理解，一个插件一个进程，仅当插件启用时才会被创建。 GPU进程：最多一个，用于3D绘制。 什么是GPU？？ Renderer进程：浏览器渲染进程，默认每个Tab页面一个进程，互不影响。 Renderer进程是多线程的，主要作用为页面渲染、脚本执行、事件处理等。 Renderer进程包含的线程Renderer进程是前端关注的重点，主要包括GUI渲染线程、JS引擎线程、事件触发线程、定时器触发线程、ajax网络请求线程等。 GUI渲染线程主要负责： HTML、CSS解析，构建DOM树和RenderObject树，布局和绘制 当发生Repaint或者reflow时，该线程就是执行 GUI渲染线程和JS引擎线程是互斥的，这两个线程同时只有一个线程运行 JS引擎线程主要作用： 负责执行javascript脚本 等待任务队列的任务触发，一个Renderer进程只有一个JS线程在运行JS程序。 JS引擎线程和GUI渲染线程是互斥的 事件触发线程主要作用： 用来控制事件循环 当JS引擎执行setTimeout、发送Ajax，绑定事件响应等，会将对应的任务添加到该线程 当对应的事件符合触发条件时，该线程会把事件添加到任务队列的末尾，等待JS引擎空闲时执行。 定时器触发线程： setTimeout 和setInterval所在线程 因为JS是单线程的，如果处于阻塞线程状态，会影响计时的准确性，所以另开线程。 计时完毕后，会将事件添加到任务队列的末尾，等待JS引擎空闲时执行。 ajax网络请求线程: 在XMLHttpRequest请求连接成功后，浏览器新开一个线程请求 在状态请求状态变更时，会产生状态变更事件，将回调函数放在任务队列的末尾，等待JS引擎空闲时执行。 js为什么是单线程其实这与它的用途有关。作为浏览器脚本语言，JavaScript 的主要用途是与用户互动，以及操作 DOM。若以多线程的方式操作这些 DOM，则可能出现操作的冲突。假设有两个线程同时操作一个 DOM 元素，线程 1 要求浏览器删除 DOM，而线程 2 却要求修改 DOM 样式，这时浏览器就无法决定采用哪个线程的操作。当然，我们可以为浏览器引入“锁”的机制来解决这些冲突，但这会大大提高复杂性，所以 JavaScript 从诞生开始就选择了单线程执行。 setTimeout 只是将事件插入到task queue,必须等到execution context stack(执行栈) 执行完成,主线程才会去执行指定的回调函数。所以当程序耗时很长时，并不能保证setTimeout能够在指定时间执行。比如：123456setTimeout(()=&gt;&#123; console.log('start');&#125;,0)for (let i = 0; i &lt; 100000; i++) &#123; console.log(i);&#125; 并不能保证在0 ms 之后打印 start并且setTimeout最短间隔不得低于 4ms，低于这个值会自动增加。setTimeout(fn,0)的意思是让fn在主线程最早有空闲的时候执行。在vue中，数据的改变并不会马上触发Dom元素的更新，需要使用$nextTick或者setTimeout(fn,0),保证可以获取到更新后的DOM元素 nodejs中的event-loop1234567891011121314151617console.log(1);setTimeout(() =&gt; &#123; console.log(2);&#125;, 0);console.log(4);process.nextTick(() =&gt; &#123; console.log(5); process.nextTick(() =&gt; &#123; console.log(6); &#125;);&#125;);setTimeout(() =&gt; &#123; console.log(7);&#125;, 0);setImmediate(() =&gt; &#123; console.log(8);&#125;, 0);]]></content>
       <tags>
         <tag>js</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[jetbrain开发工具webstorm、phpstorm设置同步]]></title>
+    <url>%2F2018%2F03%2F19%2Fjetbrain-setting%2F</url>
+    <content type="text"><![CDATA[开发使用jetbrain开发工具，经常会改动配置文件，比如：修改快捷键、代码段、文件模板等，需要同步公司和个人电脑的配置。最开始使用的是Dropbox同步配置文件，每次改动都需要导出，然后每个编辑器再导入，非常麻烦，效率很低。今天发现webstrom等自动设置同步插件，只有设置一个同步仓库，每次IDE启动、退出时默认同步配置，非常的方便。 这个插件的名字 settings repository,一般自带这个插件，没有的话到插件中心下载就好了。这个是详细的介绍地址 Settings Repository]]></content>
+      <tags>
+        <tag>editor</tag>
       </tags>
   </entry>
   <entry>

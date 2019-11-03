@@ -311,6 +311,154 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/25/promise/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/25/promise/" itemprop="url">es6 Promise 复习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T18:10:06+08:00">
+                2018-03-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/03/25/promise/" class="leancloud_visitors" data-flag-title="es6 Promise 复习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Promise 三种状态pending,rejected,fulfilled，只有异步操作的结果能够决定当前的状态，并且状态一旦改变，不能修改。</p>
+<p> 一般来说，调用resolve或reject以后，Promise 的使命就完成了，后继操作应该放到then方法里面，而不应该直接写在resolve或reject的后面。所以，最好在它们前面加上return语句，这样就不会有意外</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 立即resolve的Promise在本轮事件循环的末尾执行的。</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> resolve(<span class="number">2</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">3</span>);</span><br><span class="line">&#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>then方法返回一个新的Promise，返回的参数作为下一个then方法的函数参数，如果返回的是一个Promise，下一个then会等待Promise状态确定。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">  resolve(<span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve1</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      resolve1(<span class="string">'resolve 1000'</span>);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">  &#125;));</span><br><span class="line">&#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve1</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      resolve1(<span class="string">'resolve 2000'</span>);</span><br><span class="line">    &#125;, <span class="number">2000</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;).then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<h3 id="Promise-resolve"><a href="#Promise-resolve" class="headerlink" title="Promise.resolve"></a>Promise.resolve</h3><p>Promise.resolve 有四种情况</p>
+<ul>
+<li>传入Promise，不做任何处理</li>
+<li>传入包含then方法的对象</li>
+<li>传入原始值或不包含then方法的对象</li>
+<li>不传任何参数</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// Promise.resolve</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> pp1 = <span class="built_in">Promise</span>.resolve(&#123; <span class="attr">a</span>: <span class="string">'1'</span> &#125;);</span><br><span class="line">pp1.then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 会调用对象的then方法，结果 先打印hahaah  在打印Promise.resolve+then,这是因为立即resolve的Promise会在本次事件循环末尾调用</span></span><br><span class="line"><span class="keyword">var</span> pp2 = <span class="built_in">Promise</span>.resolve(&#123;</span><br><span class="line">  a: <span class="string">'2'</span>, then(resolve) &#123;</span><br><span class="line">    resolve(<span class="string">'Promise.resolve+then'</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'hahaah'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">pp2.then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果没有then方法，会直接传入then 方法的回调函数的参数</span></span><br></pre></td></tr></table></figure>
+<h3 id="Promise-try"><a href="#Promise-try" class="headerlink" title="Promise.try"></a>Promise.try</h3><p>不管是同步还是异步操作,Promise.try为所有操作提供了统一的处理机制，所以如果想用then方法管理流程,最好都用Promise.try包装一下。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// Promise.try()  </span></span><br><span class="line"><span class="comment">// 实现方法</span></span><br><span class="line"><span class="built_in">Promise</span>.try = <span class="function"><span class="keyword">function</span> (<span class="params">func</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">this</span>(<span class="function"><span class="keyword">function</span> (<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">    resolve(func());</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h3 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h3><p>promise错误会一直向后传递,如果没有指定catch方法的话，Promise对象抛出的错误不会传递到外层代码。</p>
+<p>Promise.all或Promise.race单个Promise没有调用自己的的catch方法，那么会被 Promise.all().catch() 或 Promise.race().catch() 捕获错误。</p>
+<h2 id="实现自己的Promise"><a href="#实现自己的Promise" class="headerlink" title="实现自己的Promise"></a>实现自己的Promise</h2><p>首先 <a href="https://promisesaplus.com/" target="_blank" rel="noopener">Promises/A+规范标准</a> 官网地址。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">MyPromise</span>(<span class="params">executor</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> self = <span class="keyword">this</span>;</span><br><span class="line">  self.status = <span class="string">'pending'</span>;</span><br><span class="line">  self.data = <span class="literal">null</span>;</span><br><span class="line">  self.onResolvedCallback = [];</span><br><span class="line">  self.onRejectdCallback = [];</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">resolve</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (value <span class="keyword">instanceof</span> MyPromise) <span class="keyword">return</span> value.then(resolve, reject);</span><br><span class="line">    <span class="comment">// 保证立即调用的resolve后面then方法添加的函数能够执行</span></span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (self.status === <span class="string">'pending'</span>) &#123;</span><br><span class="line">        self.status = <span class="string">'fulfilled'</span>;</span><br><span class="line">        self.data = value;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, len = self.onResolvedCallback.length; i &lt; len; i++) &#123;</span><br><span class="line">          self.onResolvedCallback[i](value);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">reject</span>(<span class="params">reason</span>) </span>&#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (self.status === <span class="string">'pending'</span>) &#123;</span><br><span class="line">        self.status = <span class="string">'reject'</span>;</span><br><span class="line">        self.data = reason;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, len = self.onRejectdCallback.length; i &lt; len; i++) &#123;</span><br><span class="line">          self.onRejectdCallback[i](reason);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    executor(resolve, reject);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    reject(e);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">resolvePromise</span>(<span class="params">promise2, x, resolve, reject</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> then;</span><br><span class="line">  <span class="keyword">var</span> thenCalledOrThrow = <span class="literal">false</span>; <span class="comment">// 保证 resolve ,reject 只执行一次</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (promise2 === x) &#123;</span><br><span class="line">    <span class="keyword">return</span> reject(<span class="keyword">new</span> <span class="built_in">TypeError</span>(<span class="string">'Chaining cycle detected for promise!'</span>));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (x <span class="keyword">instanceof</span> MyPromise) &#123;</span><br><span class="line">    <span class="keyword">if</span> (x.status === <span class="string">'pending'</span>) &#123; <span class="comment">//because x could resolved by a Promise Object</span></span><br><span class="line">      x.then(<span class="function"><span class="keyword">function</span> (<span class="params">v</span>) </span>&#123;</span><br><span class="line">        resolvePromise(promise2, v, resolve, reject);</span><br><span class="line">      &#125;, reject);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">//but if it is resolved, it will never resolved by a Promise Object but a static value;</span></span><br><span class="line">      x.then(resolve, reject);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ((x !== <span class="literal">null</span>) &amp;&amp; ((<span class="keyword">typeof</span> x === <span class="string">'object'</span>) || (<span class="keyword">typeof</span> x === <span class="string">'function'</span>))) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      then = x.then; <span class="comment">//because x.then could be a getter</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> then === <span class="string">'function'</span>) &#123;</span><br><span class="line">        then.call(x, <span class="function"><span class="keyword">function</span> <span class="title">rs</span>(<span class="params">y</span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (thenCalledOrThrow) <span class="keyword">return</span>;</span><br><span class="line">          thenCalledOrThrow = <span class="literal">true</span>;</span><br><span class="line">          <span class="keyword">return</span> resolvePromise(promise2, y, resolve, reject);</span><br><span class="line">        &#125;, <span class="function"><span class="keyword">function</span> <span class="title">rj</span>(<span class="params">r</span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (thenCalledOrThrow) <span class="keyword">return</span>;</span><br><span class="line">          thenCalledOrThrow = <span class="literal">true</span>;</span><br><span class="line">          <span class="keyword">return</span> reject(r);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        resolve(x);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      <span class="keyword">if</span> (thenCalledOrThrow) <span class="keyword">return</span>;</span><br><span class="line">      thenCalledOrThrow = <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">return</span> reject(e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    resolve(x);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MyPromise.prototype.then = <span class="function"><span class="keyword">function</span> (<span class="params">onResolve, onRejectd</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> self = <span class="keyword">this</span>;</span><br><span class="line">  <span class="keyword">var</span> promise2;</span><br><span class="line">  onResolve = <span class="keyword">typeof</span> onResolve === <span class="string">'function'</span> ? onResolve : <span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="comment">/*  解决值的穿透问题 MyPromise().then().then().then(res =&gt; &#123;</span></span><br><span class="line"><span class="comment">     console.log(res);</span></span><br><span class="line"><span class="comment">     &#125;);*/</span></span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">  &#125;;</span><br><span class="line">  onRejectd = <span class="keyword">typeof</span> onRejectd === <span class="string">'function'</span> ? onRejectd : <span class="function"><span class="keyword">function</span> (<span class="params">reason</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> reason;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (self.status === <span class="string">'fulfilled'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> promise2 = <span class="keyword">new</span> MyPromise(<span class="function"><span class="keyword">function</span> (<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 异步调用</span></span><br><span class="line">      setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onResolve(self.data);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (reason) &#123;</span><br><span class="line">          reject(reason);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (self.status === <span class="string">'reject'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> promise2 = <span class="keyword">new</span> MyPromise(<span class="function"><span class="keyword">function</span> (<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">      setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onRejectd(self.data);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (reason) &#123;</span><br><span class="line">          reject(reason);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当pending时，不能确定调用 onResolve,还是 onRejectd</span></span><br><span class="line">  <span class="keyword">if</span> (self.status === <span class="string">'pending'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> promise2 = <span class="keyword">new</span> MyPromise(<span class="function"><span class="keyword">function</span> (<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">      self.onResolvedCallback.push(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onResolve(value);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (r) &#123;</span><br><span class="line">          reject(r);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line"></span><br><span class="line">      self.onRejectdCallback.push(<span class="function"><span class="keyword">function</span> (<span class="params">reason</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onRejectd(reason);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">          reject(e);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">MyPromise.prototype.catch = <span class="function"><span class="keyword">function</span> (<span class="params">onRejectd</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.then(<span class="literal">null</span>, onRejectd);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>测试 <code>promise</code><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm i -g promises-aplus-tests</span><br><span class="line">promises-aplus-tests Promise.js</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/24/source-code/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -624,138 +772,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/19/jetbrain-setting/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ltinyho">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ltinyho's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/19/jetbrain-setting/" itemprop="url">jetbrain开发工具webstorm、phpstorm设置同步</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-19T12:46:58+08:00">
-                2018-03-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2018/03/19/jetbrain-setting/" class="leancloud_visitors" data-flag-title="jetbrain开发工具webstorm、phpstorm设置同步">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>开发使用jetbrain开发工具，经常会改动配置文件，比如：修改快捷键、代码段、文件模板等，需要同步公司和个人电脑的配置。最开始使用的是Dropbox同步配置文件，每次改动都需要导出，然后每个编辑器再导入，非常麻烦，效率很低。今天发现webstrom等自动设置同步插件，只有设置一个同步仓库，每次IDE启动、退出时默认同步配置，非常的方便。</p>
-<p>这个插件的名字 <code>settings repository</code>,一般自带这个插件，没有的话到插件中心下载就好了。<br>这个是详细的介绍地址 <a href="https://www.jetbrains.com/help/webstorm/settings-repository.html" target="_blank" rel="noopener">Settings Repository</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/19/javascript-event-loop/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -904,6 +920,138 @@
 <p>setTimeout 只是将事件插入到<code>task queue</code>,必须等到<code>execution context stack</code>(执行栈) 执行完成,<br>主线程才会去执行指定的回调函数。所以当程序耗时很长时，并不能保证setTimeout能够在指定时间执行。比如：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'start'</span>);</span><br><span class="line">&#125;,<span class="number">0</span>)</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="number">100000</span>; i++) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>并不能保证在0 ms 之后打印 start并且<code>setTimeout</code>最短间隔不得低于 4ms，低于这个值会自动增加。<br><code>setTimeout(fn,0)</code>的意思是让<code>fn</code>在主线程最早有空闲的时候执行。<br>在<code>vue</code>中，数据的改变并不会马上触发<code>Dom</code>元素的更新，需要使用<code>$nextTick</code>或者<code>setTimeout(fn,0)</code>,保证可以获取到更新后的<code>DOM</code>元素</p>
 <h3 id="nodejs中的event-loop"><a href="#nodejs中的event-loop" class="headerlink" title="nodejs中的event-loop"></a>nodejs中的event-loop</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">2</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">4</span>);</span><br><span class="line">process.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">5</span>);</span><br><span class="line">  process.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">6</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">7</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line">setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">8</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/19/jetbrain-setting/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/19/jetbrain-setting/" itemprop="url">jetbrain开发工具webstorm、phpstorm设置同步</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-19T12:46:58+08:00">
+                2018-03-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/03/19/jetbrain-setting/" class="leancloud_visitors" data-flag-title="jetbrain开发工具webstorm、phpstorm设置同步">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>开发使用jetbrain开发工具，经常会改动配置文件，比如：修改快捷键、代码段、文件模板等，需要同步公司和个人电脑的配置。最开始使用的是Dropbox同步配置文件，每次改动都需要导出，然后每个编辑器再导入，非常麻烦，效率很低。今天发现webstrom等自动设置同步插件，只有设置一个同步仓库，每次IDE启动、退出时默认同步配置，非常的方便。</p>
+<p>这个插件的名字 <code>settings repository</code>,一般自带这个插件，没有的话到插件中心下载就好了。<br>这个是详细的介绍地址 <a href="https://www.jetbrains.com/help/webstorm/settings-repository.html" target="_blank" rel="noopener">Settings Repository</a></p>
 
           
         
@@ -1667,212 +1815,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2017/12/17/keep-study/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ltinyho">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ltinyho's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/17/keep-study/" itemprop="url">保持学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-17T19:57:10+08:00">
-                2017-12-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/12/17/keep-study/" class="leancloud_visitors" data-flag-title="保持学习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>今天看了<code>gitchat</code>上的文章，做做笔记。</p>
-<p>文章：</p>
-<ul>
-<li><a href="http://gitbook.cn/books/59dcd7161e6d652a5a9c8ee5/index.html" target="_blank" rel="noopener">不走弯路的五大学习策略</a></li>
-<li><a href="http://gitbook.cn/books/584eab4f64db2b181a9cd975/index.html" target="_blank" rel="noopener">升职加薪：8小时之外的人生</a></li>
-</ul>
-<h3 id="学习的三个维度"><a href="#学习的三个维度" class="headerlink" title="学习的三个维度"></a>学习的三个维度</h3><blockquote>
-<p><strong>学习 = 学 + 习</strong></p>
-</blockquote>
-<p>学是容易获得成就感的，实践相对来说更枯燥一些，光学不练的学习都是假学习。</p>
-<blockquote>
-<p><strong>学习 = 动机 + 内容 + 交互</strong></p>
-</blockquote>
-<h4 id="增强动机"><a href="#增强动机" class="headerlink" title="增强动机"></a>增强动机</h4><p>学习之前先思考一下：</p>
-<ul>
-<li>为什么学呀</li>
-<li>学了可以干啥</li>
-<li>不学会怎样啊</li>
-</ul>
-<p>动力不足的话可以先YY一下，学成之后的情景。这样可以增强自己的冬季，也可以避免盲目的学习。</p>
-<h4 id="精选内容"><a href="#精选内容" class="headerlink" title="精选内容"></a>精选内容</h4><p>「N 手知识」概念？</p>
-<blockquote>
-<p>一手知识来自于一线专家，通过和他们交流，或者读他们的论文来学习。<br>  二手知识是发明某个理论的专家亲自写的书。<br>  三手知识是其他人读了专家的书之后翻译成大家都能懂的语言的畅销书，或者培训师通过故事案例来传递的知识。<br>  四手知识是某些人为了实现某种目的而写的免费文章，常常断章取义。</p>
-</blockquote>
-<p>要看自己更容易消化哪种知识，在不同的阶段，是不一样的。</p>
-<blockquote>
-<p>适合自己的知识才是最好的  </p>
-</blockquote>
-<h4 id="联机交互"><a href="#联机交互" class="headerlink" title="联机交互"></a>联机交互</h4><p>在完成知识的原始积累的情况下，跟他人讨论学习。</p>
-<h3 id="学习的效率"><a href="#学习的效率" class="headerlink" title="学习的效率"></a>学习的效率</h3><blockquote>
-<p>效率 = 收益 / 资源</p>
-</blockquote>
-<p>高效学习，不是指高效率学习，也不是快速学习，而是高效益。<br>学习的效益等于获得收益除以投入的资源（时间、金钱、精力）。</p>
-<h4 id="放大收益"><a href="#放大收益" class="headerlink" title="放大收益"></a>放大收益</h4><p>学习做产品，把自己的能力包装成产品，卖给更多的人，卖的更贵。</p>
-<p>学习一下写作、演讲和培训通用的技能，不管的那个领域的知识，都可以通过写作、演讲和培训来放大收益。</p>
-<h4 id="匹配资源"><a href="#匹配资源" class="headerlink" title="匹配资源"></a>匹配资源</h4><p>针对不同的学习材料，需要投入的时间和精力是不一样的。<br>学习材料分级：认知型，知识型，娱乐型。</p>
-<ul>
-<li>认知型 适合精力充沛时花整段的时间来学习的知识，比如：编程、数学、英语</li>
-<li>知识型 适合精力较好，碎片化的时间，阅读一些知识型的材料，比如：产品、消费者心理学</li>
-<li>娱乐型 适合饭后，晚上精力比较差，时间也比较碎时浏览的内容，比如：社交媒体、博客订阅</li>
-</ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>增强动机：</p>
-<ul>
-<li>列举正在学习的一项技能的愿景、价值和规条</li>
-<li>列举兴趣清单</li>
-<li>记录问题清单</li>
-</ul>
-<p>精选内容：</p>
-<ul>
-<li>尝试读一篇论文</li>
-<li>找到编程领域的知识源头</li>
-<li>联机交互：</li>
-</ul>
-<p>梳理联机学习者清单</p>
-<ul>
-<li>尝试组织或参加一次私董会</li>
-<li>加入 1 个学习社群</li>
-</ul>
-<p>放大收益：</p>
-<ul>
-<li>开始写文章发布到简书</li>
-<li>列举输出渠道清单</li>
-<li>发布一场 GitChat</li>
-</ul>
-<p>匹配资源：</p>
-<ul>
-<li>明天尝试早起学习</li>
-<li>将书架上的书分成认知型、知识型、娱乐型三类</li>
-</ul>
-<p>8小时之外如何成长：</p>
-<ul>
-<li>端正自己的心态，学到的都是自己的，好相处</li>
-<li>知其然，更要知其所以然，工作可以先完成，后面还是要搞懂为什么</li>
-<li>主动发现问题并解决</li>
-<li>跟上公司的发展，提前学习</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1924,7 +1866,7 @@
             
               <a href="/archives/">
             
-                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-count">39</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

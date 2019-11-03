@@ -311,6 +311,148 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/11/03/internet-key-exchange/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/03/internet-key-exchange/" itemprop="url">Diffie–Hellman 密钥交换协议</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-03T09:23:00+08:00">
+                2019-11-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/11/03/internet-key-exchange/" class="leancloud_visitors" data-flag-title="Diffie–Hellman 密钥交换协议">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>问题:如何在不安全的网络上传送秘钥?</p>
+<p>假设有两个人 alice 和 bob,在不安全的网络情况下,￿他们俩沟通的每一句话都会被第三方 joe 知道,如何协商出一个只有他们两个人知道的秘钥?<br>所有的信息都会被第三方知道的情况下,通过两个人独自保密的信息,计算得到一个相同的值.需要的计算量必须非常大,使第三方即使知道沟通的内容,也很难计算得出结果.</p>
+<p>Diffie-Hellman 密钥交换协议的有效性依赖计算离散对数的难度.</p>
+<p>y=g^x mod p,在已知g,x,p的情况下,计算 y 是非常快的,但是已知 y,g,p 的情况下计算 x 的值是非常困难的.p 取很大的素数.<a href="https://flat2010.github.io/2018/04/19/%E6%A8%A1%E8%BF%90%E7%AE%97%E4%B8%AD%E4%B8%BA%E4%BD%95%E8%A6%81%E7%94%A8%E7%B4%A0%E6%95%B0%E4%BD%9C%E4%B8%BA%E6%A8%A1/" target="_blank" rel="noopener">模运算中为何要用素数作为模</a><br>秘钥交换过程:</p>
+<ul>
+<li>alice 和 bob 先协商 g,p 的值</li>
+<li>alice 私密的值 a , A=g^a mod p ,将 A 发送给 bob</li>
+<li>bob 私密的值 b, B=g^b mod p,将 B 发送给 alice</li>
+<li>alice 计算 B^a mod p = (g^b)^a mod p = g^ab mod p = S</li>
+<li>bob 计算 A^b mod p = (g^a)^b mod p = g^ab mof p = S</li>
+<li>现在 alice 和 bob 有了共同的秘钥 S,由于计算量很大,即使 joe 知道 g,p,A,B,也很难计算出 ab 的值</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/10/11/idea-git-commit-merge/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1783,161 +1925,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/12/08/mq-study/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ltinyho">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ltinyho's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/08/mq-study/" itemprop="url">消息队列</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-08T11:01:18+08:00">
-                2018-12-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2018/12/08/mq-study/" class="leancloud_visitors" data-flag-title="消息队列">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><p>消息队列(<code>Message queue</code>),简称<code>MQ</code>,是一种进程间通信或者同一进程的不同线程间的通信方式。通用的使用场景为:</p>
-<blockquote>
-<p>不需要立即获取结果,但是并发量又要进行控制时。</p>
-</blockquote>
-<h3 id="二、使用场景"><a href="#二、使用场景" class="headerlink" title="二、使用场景"></a>二、使用场景</h3><p>消息队列主要使用场景：</p>
-<ul>
-<li>异步处理：多应用对消息队列中同一消息进行处理，应用间并发处理消息，减少处理时间。</li>
-<li>应用耦合：多应用对消息队列中同一消息进行处理，避免应用接口失败导致整个过程的失败。</li>
-<li>限流削峰: 避免流量过大导致应用挂掉。</li>
-<li>消息驱动的系统：系统分为消息队列、消息生产者、消息消费者，生产者负责产生消息，消费者(可能有多个)负责对消息进行处理. 多个子系统由消息队列连接起来,比如:日志处理.<h3 id="三、消息队列的两种模式"><a href="#三、消息队列的两种模式" class="headerlink" title="三、消息队列的两种模式"></a>三、消息队列的两种模式</h3></li>
-</ul>
-<p>消息队列包括两种模式，点对点模式（point to point， queue）和发布/订阅模式（publish/subscribe，topic).</p>
-<p>点对点模式,主要是一个消息只有一个消费者.当消费者接收到消息后,向消息队列通知应答成功,消息队列将该消息从队列中删除.<br>点对点模式特点:</p>
-<ul>
-<li>每个消息只有一个接收者（Consumer)；</li>
-<li>发送者和接收者间没有依赖性，发送者发送消息之后，不管有没有接收者在运行，都不会影响到发送者下次发送消息；</li>
-<li>接收者在成功接收消息之后需向队列应答成功，以便消息队列删除当前接收的消息；</li>
-</ul>
-<p>发布订阅模式,发布者将消息发送到<code>Topic</code>,系统将这些消息传递给多个订阅者.<br>发布/订阅模式特点:</p>
-<ul>
-<li>每个消息可以有多个订阅者；</li>
-<li>发布者和订阅者之间有时间上的依赖性。针对某个主题（Topic）的订阅者，它必须创建一个订阅者之后，才能消费发布者的消息。</li>
-<li>为了消费消息，订阅者需要提前订阅，并保持在线运行；</li>
-</ul>
-<p>当发布者消息量很大时，显然单个订阅者的处理能力是不足的,多个订阅者节点组成一个订阅组负载均衡消费<code>topic</code>消息实现分组订阅.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1989,7 +1976,7 @@
             
               <a href="/archives/">
             
-                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-count">39</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

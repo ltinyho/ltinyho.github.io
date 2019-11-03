@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://blog.ltinyho.top/2019/11/03/internet-key-exchange/</loc>
+    <lastmod>2019-11-03T02:04:41.609Z</lastmod>
+  </url>  <url>
     <loc>http://blog.ltinyho.top/2019/10/11/idea-git-commit-merge/</loc>
     <lastmod>2019-10-12T02:14:39.691Z</lastmod>
   </url>  <url>
@@ -16,13 +19,13 @@
     <loc>http://blog.ltinyho.top/2017/06/15/vue-config-webpack-dll/</loc>
     <lastmod>2019-08-18T07:19:56.374Z</lastmod>
   </url>  <url>
-    <loc>http://blog.ltinyho.top/2017/04/23/vue-config-flow/</loc>
+    <loc>http://blog.ltinyho.top/2017/09/16/swiper-use/</loc>
     <lastmod>2019-08-18T07:19:56.374Z</lastmod>
   </url>  <url>
     <loc>http://blog.ltinyho.top/2017/12/20/technology-driven/</loc>
     <lastmod>2019-08-18T07:19:56.374Z</lastmod>
   </url>  <url>
-    <loc>http://blog.ltinyho.top/2017/09/16/swiper-use/</loc>
+    <loc>http://blog.ltinyho.top/2017/04/23/vue-config-flow/</loc>
     <lastmod>2019-08-18T07:19:56.374Z</lastmod>
   </url>  <url>
     <loc>http://blog.ltinyho.top/2018/02/27/reference-or-value-javascript/</loc>
@@ -52,9 +55,6 @@
     <loc>http://blog.ltinyho.top/2017/12/17/stop-wechat-video-load/</loc>
     <lastmod>2019-08-18T07:19:56.373Z</lastmod>
   </url>  <url>
-    <loc>http://blog.ltinyho.top/2018/12/08/redis-start/</loc>
-    <lastmod>2019-08-18T07:19:56.372Z</lastmod>
-  </url>  <url>
     <loc>http://blog.ltinyho.top/2018/09/04/miniwebpack/</loc>
     <lastmod>2019-08-18T07:19:56.372Z</lastmod>
   </url>  <url>
@@ -80,6 +80,9 @@
     <lastmod>2019-08-18T07:19:56.372Z</lastmod>
   </url>  <url>
     <loc>http://blog.ltinyho.top/2018/03/25/promise/</loc>
+    <lastmod>2019-08-18T07:19:56.372Z</lastmod>
+  </url>  <url>
+    <loc>http://blog.ltinyho.top/2018/12/08/redis-start/</loc>
     <lastmod>2019-08-18T07:19:56.372Z</lastmod>
   </url>  <url>
     <loc>http://blog.ltinyho.top/2019/06/01/go-retry/</loc>
