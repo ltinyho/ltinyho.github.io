@@ -311,6 +311,188 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/12/08/redis-start/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/08/redis-start/" itemprop="url">redis 入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-08T13:51:57+08:00">
+                2018-12-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/12/08/redis-start/" class="leancloud_visitors" data-flag-title="redis 入门">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><p><code>redis</code> 使用C语言编写的高性能键值对内存数据库,<a href="https://github.com/antirez/redis" target="_blank" rel="noopener">仓库地址</a></p>
+<p>支持的键值数据类型:</p>
+<ul>
+<li>字符串</li>
+<li>列表</li>
+<li>有序集合</li>
+<li>散列</li>
+<li>集合</li>
+</ul>
+<p><code>redis</code>的主要应用场景:</p>
+<ul>
+<li>缓存</li>
+<li>消息队列</li>
+<li>计数</li>
+<li>排行榜</li>
+</ul>
+<h3 id="二、redis-数据类型"><a href="#二、redis-数据类型" class="headerlink" title="二、redis 数据类型"></a>二、<code>redis</code> 数据类型</h3><p>键值对<code>key</code>的注意事项：</p>
+<ul>
+<li>不要过长 最好不要超过1024个字节,不仅消耗内存，也影响查找效率</li>
+<li>不要过短 比如设置为a，没有实际意义，可能会降低key的可读性</li>
+<li>统一命名规范</li>
+</ul>
+<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><p><code>string</code> 中的一个 <code>key</code> 对应一个 <code>value</code></p>
+<p>常用命令:</p>
+<ul>
+<li><code>set      key  value</code>      # 赋值</li>
+<li><code>get      key</code>      # 取值</li>
+<li><code>getset   key  value</code>   # 取原值并设置新值</li>
+<li><code>incr     key</code>     #  自增1,如果该key不存在，则创建该key，并赋值为0，key存在,则自增加1</li>
+<li><code>incrby   key  num</code>   # 自增指定值</li>
+<li><code>decr     key</code>     # 自减</li>
+<li><code>decrby   key  num</code>   # 自减指定值</li>
+</ul>
+<h4 id="哈希-hash"><a href="#哈希-hash" class="headerlink" title="哈希 hash"></a>哈希 hash</h4><p>hash可以存储多个键值对之间的映射</p>
+<ul>
+<li><code>hset key field value</code>  # 设置单个</li>
+<li><code>hmset key field value [field value ... ]</code> # 一次设置多个</li>
+</ul>
+<h4 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h4><ul>
+<li><code>lpush key value [value ...]</code> # 从列表左边推入</li>
+<li><code>rpush key value [value ...]</code> # 从列表右边推入</li>
+<li><p><code>lrange key start stop</code>        # 查看列表,<code>lrange key 0 -1</code> 查看整个列表</p>
+<h4 id="通用-key-操作"><a href="#通用-key-操作" class="headerlink" title="通用 key 操作"></a>通用 <code>key</code> 操作</h4></li>
+<li><p><code>expire  key second</code>     # 设置 key 的有效期</p>
+</li>
+<li><code>ttl     key</code>     # 查看 key 的离到期还剩多少秒</li>
+<li><code>type    key</code>     # 查看 key 的类型</li>
+<li><code>del     key</code>     #删除 key</li>
+</ul>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a href="https://www.cnblogs.com/xinysu/p/7366142.html#_label1" target="_blank" rel="noopener">Redis 入门笔记</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/12/08/mq-study/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1645,145 +1827,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/26/macro-task-and-micro-task/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ltinyho">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ltinyho's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/26/macro-task-and-micro-task/" itemprop="url">macro tasks 和 micro tasks 学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T22:59:16+08:00">
-                2018-03-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2018/03/26/macro-task-and-micro-task/" class="leancloud_visitors" data-flag-title="macro tasks 和 micro tasks 学习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>今天看了一篇有关macro和micro任务的文章，记录一下学习所获。<br>文章地址 <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank" rel="noopener">Tasks, microtasks, queues and schedules</a></p>
-<p>首先感受一下代码</p>
-<figure class="highlight plain"><figcaption><span>6</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">console.log(&apos;start&apos;)</span><br><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;sto&apos;);</span><br><span class="line">&#125;,0)</span><br><span class="line"></span><br><span class="line">new Promise().then(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;promise 1&apos;);</span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;promise 2&apos;);</span><br><span class="line">&#125;)</span><br><span class="line">console.log(&apos;end&apos;)</span><br></pre></td></tr></table></figure>
-<p>上面这段代码的打印顺序为</p>
-<p><code>start</code>,<code>end</code>,<code>promise1</code>,<code>promise2</code>,<code>sto</code>。</p>
-<p>为什么会这样呢？这里需要我们理解事件循环是如何处理<code>macro tasks</code> 和 <code>micor tasks</code> 的。</p>
-<p>每一个线程都有自己的事件循环，这样每个线程能够独立，所有的同源窗口共享同一个事件循环，这样它们就能够同步通信。</p>
-<p>一个事件循环存在多个事件源，这样按照不同任务源的优先级执行，确保了任务源的执行顺序。</p>
-<p>前面刚复习过 <code>Promise</code>，立即 <code>resolve</code>的 <code>Promise</code> 在本次事件循环的末尾执行。</p>
-<h3 id="macro-和-micro-区别"><a href="#macro-和-micro-区别" class="headerlink" title="macro 和 micro 区别"></a>macro 和 micro 区别</h3><h3 id="promise-为什么是-micro"><a href="#promise-为什么是-micro" class="headerlink" title="promise 为什么是 micro"></a>promise 为什么是 micro</h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1835,7 +1878,7 @@
             
               <a href="/archives/">
             
-                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-count">40</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

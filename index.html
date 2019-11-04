@@ -311,6 +311,140 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/11/04/tcp-keepalive/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/04/tcp-keepalive/" itemprop="url">tcp keepalive in go</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-04T19:19:00+08:00">
+                2019-11-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/11/04/tcp-keepalive/" class="leancloud_visitors" data-flag-title="tcp keepalive in go">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><code>http 1.1</code> 默认开启了 <code>tcp</code> keepalive,复用 connection.在 <code>go</code> 中发起 <code>http</code> 请求,如何使用 keepalive 呢?<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	QHTTPTransport http.RoundTripper = &amp;http.Transport&#123;</span><br><span class="line">		Proxy: http.ProxyFromEnvironment,</span><br><span class="line">		DialContext: (&amp;net.Dialer&#123;</span><br><span class="line">			Timeout:   <span class="number">30</span> * time.Second,</span><br><span class="line">			KeepAlive: <span class="number">30</span> * time.Second,</span><br><span class="line">			DualStack: <span class="literal">true</span>,</span><br><span class="line">		&#125;).DialContext,</span><br><span class="line">		MaxIdleConns:          <span class="number">100</span>,</span><br><span class="line">		MaxIdleConnsPerHost:   <span class="number">5</span>,</span><br><span class="line">		IdleConnTimeout:       <span class="number">90</span> * time.Second,</span><br><span class="line">		TLSHandshakeTimeout:   <span class="number">10</span> * time.Second,</span><br><span class="line">		ExpectContinueTimeout: <span class="number">1</span> * time.Second,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	QHTTPClient = &amp;http.Client&#123;</span><br><span class="line">		Transport: QHTTPTransport,</span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>发起 <code>http</code> 请求时,使用 <code>QHTTPClient</code>.<br><code>go</code> 服务端 <code>http.ListenAndServe(&quot;:8080&quot;,nil)</code> 默认开启了 <code>keepalive</code>,时间间隔是 <code>30s</code>.<br><img src="http://cdn.ltinyho.top/notes/20191104193247.png" alt="上传时间间隔"><br>自定义:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   srv := http.Server&#123;</span><br><span class="line">	Handler: mux,</span><br><span class="line">&#125;</span><br><span class="line">srv.SetKeepAlivesEnabled(<span class="literal">false</span>)</span><br></pre></td></tr></table></figure></p>
+<p>或者自定义 listener<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> tcpKeepAliveListener <span class="keyword">struct</span> &#123;</span><br><span class="line">	*net.TCPListener</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(ln tcpKeepAliveListener)</span> <span class="title">Accept</span><span class="params">()</span> <span class="params">(net.Conn, error)</span></span> &#123;</span><br><span class="line">	tc, err := ln.AcceptTCP()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	tc.SetKeepAlive(<span class="literal">true</span>)</span><br><span class="line">	tc.SetKeepAlivePeriod(time.Second*<span class="number">10</span>) <span class="comment">// 设置 keepalive period</span></span><br><span class="line">	<span class="keyword">return</span> tc, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    err = srv.Serve(tcpKeepAliveListener&#123;ln.(*net.TCPListener)&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>gin</code> 框架自定义 <code>keepalive</code><br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">router := gin.Default()</span><br><span class="line"></span><br><span class="line">   s := &amp;http.Server&#123;</span><br><span class="line">       Addr:           <span class="string">":8080"</span>,</span><br><span class="line">       Handler:        router, <span class="comment">// &lt; here Gin is attached to the HTTP server</span></span><br><span class="line">   &#125;</span><br><span class="line">   s.SetKeepAlivesEnabled(<span class="literal">false</span>)</span><br><span class="line">   s.ListenAndServe()</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/11/03/internet-key-exchange/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1743,188 +1877,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/12/08/redis-start/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ltinyho">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ltinyho's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/08/redis-start/" itemprop="url">redis 入门</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-08T13:51:57+08:00">
-                2018-12-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2018/12/08/redis-start/" class="leancloud_visitors" data-flag-title="redis 入门">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><p><code>redis</code> 使用C语言编写的高性能键值对内存数据库,<a href="https://github.com/antirez/redis" target="_blank" rel="noopener">仓库地址</a></p>
-<p>支持的键值数据类型:</p>
-<ul>
-<li>字符串</li>
-<li>列表</li>
-<li>有序集合</li>
-<li>散列</li>
-<li>集合</li>
-</ul>
-<p><code>redis</code>的主要应用场景:</p>
-<ul>
-<li>缓存</li>
-<li>消息队列</li>
-<li>计数</li>
-<li>排行榜</li>
-</ul>
-<h3 id="二、redis-数据类型"><a href="#二、redis-数据类型" class="headerlink" title="二、redis 数据类型"></a>二、<code>redis</code> 数据类型</h3><p>键值对<code>key</code>的注意事项：</p>
-<ul>
-<li>不要过长 最好不要超过1024个字节,不仅消耗内存，也影响查找效率</li>
-<li>不要过短 比如设置为a，没有实际意义，可能会降低key的可读性</li>
-<li>统一命名规范</li>
-</ul>
-<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><p><code>string</code> 中的一个 <code>key</code> 对应一个 <code>value</code></p>
-<p>常用命令:</p>
-<ul>
-<li><code>set      key  value</code>      # 赋值</li>
-<li><code>get      key</code>      # 取值</li>
-<li><code>getset   key  value</code>   # 取原值并设置新值</li>
-<li><code>incr     key</code>     #  自增1,如果该key不存在，则创建该key，并赋值为0，key存在,则自增加1</li>
-<li><code>incrby   key  num</code>   # 自增指定值</li>
-<li><code>decr     key</code>     # 自减</li>
-<li><code>decrby   key  num</code>   # 自减指定值</li>
-</ul>
-<h4 id="哈希-hash"><a href="#哈希-hash" class="headerlink" title="哈希 hash"></a>哈希 hash</h4><p>hash可以存储多个键值对之间的映射</p>
-<ul>
-<li><code>hset key field value</code>  # 设置单个</li>
-<li><code>hmset key field value [field value ... ]</code> # 一次设置多个</li>
-</ul>
-<h4 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h4><ul>
-<li><code>lpush key value [value ...]</code> # 从列表左边推入</li>
-<li><code>rpush key value [value ...]</code> # 从列表右边推入</li>
-<li><p><code>lrange key start stop</code>        # 查看列表,<code>lrange key 0 -1</code> 查看整个列表</p>
-<h4 id="通用-key-操作"><a href="#通用-key-操作" class="headerlink" title="通用 key 操作"></a>通用 <code>key</code> 操作</h4></li>
-<li><p><code>expire  key second</code>     # 设置 key 的有效期</p>
-</li>
-<li><code>ttl     key</code>     # 查看 key 的离到期还剩多少秒</li>
-<li><code>type    key</code>     # 查看 key 的类型</li>
-<li><code>del     key</code>     #删除 key</li>
-</ul>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
-<li><a href="https://www.cnblogs.com/xinysu/p/7366142.html#_label1" target="_blank" rel="noopener">Redis 入门笔记</a></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1976,7 +1928,7 @@
             
               <a href="/archives/">
             
-                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-count">40</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

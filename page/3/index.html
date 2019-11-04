@@ -311,6 +311,145 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/26/macro-task-and-micro-task/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/26/macro-task-and-micro-task/" itemprop="url">macro tasks 和 micro tasks 学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T22:59:16+08:00">
+                2018-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/03/26/macro-task-and-micro-task/" class="leancloud_visitors" data-flag-title="macro tasks 和 micro tasks 学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>今天看了一篇有关macro和micro任务的文章，记录一下学习所获。<br>文章地址 <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank" rel="noopener">Tasks, microtasks, queues and schedules</a></p>
+<p>首先感受一下代码</p>
+<figure class="highlight plain"><figcaption><span>6</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">console.log(&apos;start&apos;)</span><br><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;sto&apos;);</span><br><span class="line">&#125;,0)</span><br><span class="line"></span><br><span class="line">new Promise().then(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;promise 1&apos;);</span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;promise 2&apos;);</span><br><span class="line">&#125;)</span><br><span class="line">console.log(&apos;end&apos;)</span><br></pre></td></tr></table></figure>
+<p>上面这段代码的打印顺序为</p>
+<p><code>start</code>,<code>end</code>,<code>promise1</code>,<code>promise2</code>,<code>sto</code>。</p>
+<p>为什么会这样呢？这里需要我们理解事件循环是如何处理<code>macro tasks</code> 和 <code>micor tasks</code> 的。</p>
+<p>每一个线程都有自己的事件循环，这样每个线程能够独立，所有的同源窗口共享同一个事件循环，这样它们就能够同步通信。</p>
+<p>一个事件循环存在多个事件源，这样按照不同任务源的优先级执行，确保了任务源的执行顺序。</p>
+<p>前面刚复习过 <code>Promise</code>，立即 <code>resolve</code>的 <code>Promise</code> 在本次事件循环的末尾执行。</p>
+<h3 id="macro-和-micro-区别"><a href="#macro-和-micro-区别" class="headerlink" title="macro 和 micro 区别"></a>macro 和 micro 区别</h3><h3 id="promise-为什么是-micro"><a href="#promise-为什么是-micro" class="headerlink" title="promise 为什么是 micro"></a>promise 为什么是 micro</h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/03/25/promise/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1680,141 +1819,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2017/12/17/risk-invest-work/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ltinyho">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ltinyho's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/17/risk-invest-work/" itemprop="url">风险 投资 劳动</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-17T19:57:10+08:00">
-                2017-12-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/12/17/risk-invest-work/" class="leancloud_visitors" data-flag-title="风险 投资 劳动">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>今天在知乎上看到一篇文章里面提到对收入的影响,<code>风险 &gt; 资本 &gt; 劳动</code>。</p>
-<h3 id="风险"><a href="#风险" class="headerlink" title="风险"></a>风险</h3><p>投资行业风险最高的天使轮投资,为idea买单,当然成功收益也很高。这个需要资本。</p>
-<h3 id="资本"><a href="#资本" class="headerlink" title="资本"></a>资本</h3><p>资本，通过资本收益，比如：房租，利息等被动收入。创办公司，自己当老板。</p>
-<h3 id="劳动"><a href="#劳动" class="headerlink" title="劳动"></a>劳动</h3><p>劳动，需要掌握一定的技能，通过出售自己的技能，时间来获得收入。当然，这种风险是较小的。公司的大部分收入是员工来创造的，但是公司老板的收入是最高的。<br>当企业经营不善时，员工是没有任何风险的，大不了公司倒闭换个公司继续工作，而老板承担的风险是最高的，他的资本投入都会赔掉。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>通过劳动实现财富的原始积累，通过资本的被动收入实现财务自由。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1866,7 +1870,7 @@
             
               <a href="/archives/">
             
-                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-count">40</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
