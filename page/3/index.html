@@ -393,17 +393,17 @@
       
         
           
-            <p>今天看了一篇有关macro和micro任务的文章，记录一下学习所获。<br>文章地址 <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank" rel="noopener">Tasks, microtasks, queues and schedules</a></p>
-<p>首先感受一下代码</p>
-<figure class="highlight plain"><figcaption><span>6</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">console.log(&apos;start&apos;)</span><br><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;sto&apos;);</span><br><span class="line">&#125;,0)</span><br><span class="line"></span><br><span class="line">new Promise().then(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;promise 1&apos;);</span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">  console.log(&apos;promise 2&apos;);</span><br><span class="line">&#125;)</span><br><span class="line">console.log(&apos;end&apos;)</span><br></pre></td></tr></table></figure>
-<p>上面这段代码的打印顺序为</p>
-<p><code>start</code>,<code>end</code>,<code>promise1</code>,<code>promise2</code>,<code>sto</code>。</p>
-<p>为什么会这样呢？这里需要我们理解事件循环是如何处理<code>macro tasks</code> 和 <code>micor tasks</code> 的。</p>
-<p>每一个线程都有自己的事件循环，这样每个线程能够独立，所有的同源窗口共享同一个事件循环，这样它们就能够同步通信。</p>
-<p>一个事件循环存在多个事件源，这样按照不同任务源的优先级执行，确保了任务源的执行顺序。</p>
-<p>前面刚复习过 <code>Promise</code>，立即 <code>resolve</code>的 <code>Promise</code> 在本次事件循环的末尾执行。</p>
-<h3 id="macro-和-micro-区别"><a href="#macro-和-micro-区别" class="headerlink" title="macro 和 micro 区别"></a>macro 和 micro 区别</h3><h3 id="promise-为什么是-micro"><a href="#promise-为什么是-micro" class="headerlink" title="promise 为什么是 micro"></a>promise 为什么是 micro</h3>
-          
+          今天看了一篇有关macro和micro任务的文章，记录一下学习所获。文章地址 Tasks, microtasks, queues and schedules
+首先感受一下代码
+61234567891011console.log(&apos;start&apos;)setTimeout(()=&gt;&#123;  console.log(&apos;sto&apos;);&#125;,0)new Promise().then(()=&gt;&#123;  console.log(&apos;promise 1&apos;);&#125;).then(()=&gt;&#123;  console
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/26/macro-task-and-micro-task/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -532,26 +532,17 @@
       
         
           
-            <p>Promise 三种状态pending,rejected,fulfilled，只有异步操作的结果能够决定当前的状态，并且状态一旦改变，不能修改。</p>
-<p> 一般来说，调用resolve或reject以后，Promise 的使命就完成了，后继操作应该放到then方法里面，而不应该直接写在resolve或reject的后面。所以，最好在它们前面加上return语句，这样就不会有意外</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 立即resolve的Promise在本轮事件循环的末尾执行的。</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> resolve(<span class="number">2</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">3</span>);</span><br><span class="line">&#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>then方法返回一个新的Promise，返回的参数作为下一个then方法的函数参数，如果返回的是一个Promise，下一个then会等待Promise状态确定。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">  resolve(<span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve1</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      resolve1(<span class="string">'resolve 1000'</span>);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">  &#125;));</span><br><span class="line">&#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve1</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      resolve1(<span class="string">'resolve 2000'</span>);</span><br><span class="line">    &#125;, <span class="number">2000</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;).then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<h3 id="Promise-resolve"><a href="#Promise-resolve" class="headerlink" title="Promise.resolve"></a>Promise.resolve</h3><p>Promise.resolve 有四种情况</p>
-<ul>
-<li>传入Promise，不做任何处理</li>
-<li>传入包含then方法的对象</li>
-<li>传入原始值或不包含then方法的对象</li>
-<li>不传任何参数</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// Promise.resolve</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> pp1 = <span class="built_in">Promise</span>.resolve(&#123; <span class="attr">a</span>: <span class="string">'1'</span> &#125;);</span><br><span class="line">pp1.then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 会调用对象的then方法，结果 先打印hahaah  在打印Promise.resolve+then,这是因为立即resolve的Promise会在本次事件循环末尾调用</span></span><br><span class="line"><span class="keyword">var</span> pp2 = <span class="built_in">Promise</span>.resolve(&#123;</span><br><span class="line">  a: <span class="string">'2'</span>, then(resolve) &#123;</span><br><span class="line">    resolve(<span class="string">'Promise.resolve+then'</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'hahaah'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">pp2.then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果没有then方法，会直接传入then 方法的回调函数的参数</span></span><br></pre></td></tr></table></figure>
-<h3 id="Promise-try"><a href="#Promise-try" class="headerlink" title="Promise.try"></a>Promise.try</h3><p>不管是同步还是异步操作,Promise.try为所有操作提供了统一的处理机制，所以如果想用then方法管理流程,最好都用Promise.try包装一下。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// Promise.try()  </span></span><br><span class="line"><span class="comment">// 实现方法</span></span><br><span class="line"><span class="built_in">Promise</span>.try = <span class="function"><span class="keyword">function</span> (<span class="params">func</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">this</span>(<span class="function"><span class="keyword">function</span> (<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">    resolve(func());</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<h3 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h3><p>promise错误会一直向后传递,如果没有指定catch方法的话，Promise对象抛出的错误不会传递到外层代码。</p>
-<p>Promise.all或Promise.race单个Promise没有调用自己的的catch方法，那么会被 Promise.all().catch() 或 Promise.race().catch() 捕获错误。</p>
-<h2 id="实现自己的Promise"><a href="#实现自己的Promise" class="headerlink" title="实现自己的Promise"></a>实现自己的Promise</h2><p>首先 <a href="https://promisesaplus.com/" target="_blank" rel="noopener">Promises/A+规范标准</a> 官网地址。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">MyPromise</span>(<span class="params">executor</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> self = <span class="keyword">this</span>;</span><br><span class="line">  self.status = <span class="string">'pending'</span>;</span><br><span class="line">  self.data = <span class="literal">null</span>;</span><br><span class="line">  self.onResolvedCallback = [];</span><br><span class="line">  self.onRejectdCallback = [];</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">resolve</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (value <span class="keyword">instanceof</span> MyPromise) <span class="keyword">return</span> value.then(resolve, reject);</span><br><span class="line">    <span class="comment">// 保证立即调用的resolve后面then方法添加的函数能够执行</span></span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (self.status === <span class="string">'pending'</span>) &#123;</span><br><span class="line">        self.status = <span class="string">'fulfilled'</span>;</span><br><span class="line">        self.data = value;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, len = self.onResolvedCallback.length; i &lt; len; i++) &#123;</span><br><span class="line">          self.onResolvedCallback[i](value);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">reject</span>(<span class="params">reason</span>) </span>&#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (self.status === <span class="string">'pending'</span>) &#123;</span><br><span class="line">        self.status = <span class="string">'reject'</span>;</span><br><span class="line">        self.data = reason;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, len = self.onRejectdCallback.length; i &lt; len; i++) &#123;</span><br><span class="line">          self.onRejectdCallback[i](reason);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    executor(resolve, reject);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    reject(e);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">resolvePromise</span>(<span class="params">promise2, x, resolve, reject</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> then;</span><br><span class="line">  <span class="keyword">var</span> thenCalledOrThrow = <span class="literal">false</span>; <span class="comment">// 保证 resolve ,reject 只执行一次</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (promise2 === x) &#123;</span><br><span class="line">    <span class="keyword">return</span> reject(<span class="keyword">new</span> <span class="built_in">TypeError</span>(<span class="string">'Chaining cycle detected for promise!'</span>));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (x <span class="keyword">instanceof</span> MyPromise) &#123;</span><br><span class="line">    <span class="keyword">if</span> (x.status === <span class="string">'pending'</span>) &#123; <span class="comment">//because x could resolved by a Promise Object</span></span><br><span class="line">      x.then(<span class="function"><span class="keyword">function</span> (<span class="params">v</span>) </span>&#123;</span><br><span class="line">        resolvePromise(promise2, v, resolve, reject);</span><br><span class="line">      &#125;, reject);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">//but if it is resolved, it will never resolved by a Promise Object but a static value;</span></span><br><span class="line">      x.then(resolve, reject);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ((x !== <span class="literal">null</span>) &amp;&amp; ((<span class="keyword">typeof</span> x === <span class="string">'object'</span>) || (<span class="keyword">typeof</span> x === <span class="string">'function'</span>))) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      then = x.then; <span class="comment">//because x.then could be a getter</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> then === <span class="string">'function'</span>) &#123;</span><br><span class="line">        then.call(x, <span class="function"><span class="keyword">function</span> <span class="title">rs</span>(<span class="params">y</span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (thenCalledOrThrow) <span class="keyword">return</span>;</span><br><span class="line">          thenCalledOrThrow = <span class="literal">true</span>;</span><br><span class="line">          <span class="keyword">return</span> resolvePromise(promise2, y, resolve, reject);</span><br><span class="line">        &#125;, <span class="function"><span class="keyword">function</span> <span class="title">rj</span>(<span class="params">r</span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (thenCalledOrThrow) <span class="keyword">return</span>;</span><br><span class="line">          thenCalledOrThrow = <span class="literal">true</span>;</span><br><span class="line">          <span class="keyword">return</span> reject(r);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        resolve(x);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      <span class="keyword">if</span> (thenCalledOrThrow) <span class="keyword">return</span>;</span><br><span class="line">      thenCalledOrThrow = <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">return</span> reject(e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    resolve(x);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MyPromise.prototype.then = <span class="function"><span class="keyword">function</span> (<span class="params">onResolve, onRejectd</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> self = <span class="keyword">this</span>;</span><br><span class="line">  <span class="keyword">var</span> promise2;</span><br><span class="line">  onResolve = <span class="keyword">typeof</span> onResolve === <span class="string">'function'</span> ? onResolve : <span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="comment">/*  解决值的穿透问题 MyPromise().then().then().then(res =&gt; &#123;</span></span><br><span class="line"><span class="comment">     console.log(res);</span></span><br><span class="line"><span class="comment">     &#125;);*/</span></span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">  &#125;;</span><br><span class="line">  onRejectd = <span class="keyword">typeof</span> onRejectd === <span class="string">'function'</span> ? onRejectd : <span class="function"><span class="keyword">function</span> (<span class="params">reason</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> reason;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (self.status === <span class="string">'fulfilled'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> promise2 = <span class="keyword">new</span> MyPromise(<span class="function"><span class="keyword">function</span> (<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 异步调用</span></span><br><span class="line">      setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onResolve(self.data);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (reason) &#123;</span><br><span class="line">          reject(reason);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (self.status === <span class="string">'reject'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> promise2 = <span class="keyword">new</span> MyPromise(<span class="function"><span class="keyword">function</span> (<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">      setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onRejectd(self.data);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (reason) &#123;</span><br><span class="line">          reject(reason);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当pending时，不能确定调用 onResolve,还是 onRejectd</span></span><br><span class="line">  <span class="keyword">if</span> (self.status === <span class="string">'pending'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> promise2 = <span class="keyword">new</span> MyPromise(<span class="function"><span class="keyword">function</span> (<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">      self.onResolvedCallback.push(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onResolve(value);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (r) &#123;</span><br><span class="line">          reject(r);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line"></span><br><span class="line">      self.onRejectdCallback.push(<span class="function"><span class="keyword">function</span> (<span class="params">reason</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">var</span> x = onRejectd(reason);</span><br><span class="line">          resolvePromise(promise2, x, resolve, reject);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">          reject(e);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">MyPromise.prototype.catch = <span class="function"><span class="keyword">function</span> (<span class="params">onRejectd</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.then(<span class="literal">null</span>, onRejectd);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>测试 <code>promise</code><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm i -g promises-aplus-tests</span><br><span class="line">promises-aplus-tests Promise.js</span><br></pre></td></tr></table></figure></p>
-
-          
+          Promise 三种状态pending,rejected,fulfilled，只有异步操作的结果能够决定当前的状态，并且状态一旦改变，不能修改。
+ 一般来说，调用resolve或reject以后，Promise 的使命就完成了，后继操作应该放到then方法里面，而不应该直接写在resolve或reject的后面。所以，最好在它们前面加上return语句，这样就不会有意外
+123456789 // 立即resolve的Promise在本轮事件循环的末尾执行的。new Promise((resolve, reject) =&gt; &#123;  console.log(1);  return r
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/25/promise/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -702,9 +693,15 @@
       
         
           
-            <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将b的方法复制到a</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">merge</span> (<span class="params">a, b</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (a &amp;&amp; b) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> b) &#123;</span><br><span class="line">      a[key] = b[key];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> a;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 链式调用</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">My</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.sum = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">My.prototype.add = <span class="function"><span class="keyword">function</span> (<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.sum = a + b;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">My.prototype.sub = <span class="function"><span class="keyword">function</span> (<span class="params">b, c</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.sum -= b + c;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> my           = <span class="keyword">new</span> My();</span><br><span class="line"><span class="built_in">console</span>.log(my.add(<span class="number">1</span>, <span class="number">6</span>).sub(<span class="number">3</span>, <span class="number">4</span>).sum);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 不调用new 实例化</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(!(<span class="keyword">this</span> <span class="keyword">instanceof</span> Person))&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Person(options)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
+          123456789101112131415161718192021222324252627282930313233343536// 将b的方法复制到afunction merge (a, b)&#123;  if (a &amp;&amp; b) &#123;    for (var key in b) &#123;      a[key] = b[key];    &#125;  &#125;  return a;&#125;;// 链式调用function My() &#123;  this.sum = 0;&#125;My.prototype.add = function (a, b) 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/24/source-code/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -855,16 +852,17 @@
       
         
           
-            <h3 id="中间件的使用案例"><a href="#中间件的使用案例" class="headerlink" title="中间件的使用案例"></a>中间件的使用案例</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">const</span> app     = express();</span><br><span class="line"></span><br><span class="line">app.use(<span class="function"><span class="keyword">function</span>(<span class="params">req,res,next</span>) </span>&#123;</span><br><span class="line">  next()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>以上是最简单的例子。一个中间件就是一个函数，参数为<code>req,res,next</code>。在这个函数中，必须执行<code>next</code>函数或者发送响应，否者服务会被挂起，客户端会一直处于等待。</p>
-<h3 id="为什么要使用中间件"><a href="#为什么要使用中间件" class="headerlink" title="为什么要使用中间件"></a>为什么要使用中间件</h3><p>在中间件中可以处理<code>req、res</code>对象，给他们增加新的方法和属性，供下一个中间件调用，还可以通过<code>next</code>控制权限，提前中断后续中间件的调用。这样的话就可以将应用的功能拆分出来，实现功能的解耦。</p>
-<h3 id="中间件的原理是什么"><a href="#中间件的原理是什么" class="headerlink" title="中间件的原理是什么"></a>中间件的原理是什么</h3><p>像<code>connect</code>内部维护了一个数组，执行<code>app.use</code>会往这个数组中增加一个中间件。当接收到一个请求时，如果中间件执行了<code>next()</code>，会依次往下执行。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">express</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> stack = []; <span class="comment">// 中间件函数数组</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">app</span>(<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">next</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> handler = stack[i++]; </span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (!handler) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 中间件函数调用,如果调用了next,相当于递归调用，下一个中间件函数就会执行</span></span><br><span class="line">      handler(req, res, next);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    next();</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 增加中间件</span></span><br><span class="line">  app.use = <span class="function"><span class="keyword">function</span> (<span class="params">middleware</span>) </span>&#123;</span><br><span class="line">    stack.push(middleware);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> app;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> app = express();</span><br><span class="line">http.createServer(app).listen(<span class="number">3000</span>);</span><br><span class="line"></span><br><span class="line">app.use(<span class="function"><span class="keyword">function</span> (<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'start1'</span>);</span><br><span class="line">  next();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'next1'</span>);</span><br><span class="line">&#125;);</span><br><span class="line">app.use(<span class="function"><span class="keyword">function</span> (<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'start2'</span>);</span><br><span class="line">  next();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'next2'</span>);</span><br><span class="line">&#125;);</span><br><span class="line">app.use(<span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'start3'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 打印结果</span></span><br><span class="line"><span class="comment">// start1</span></span><br><span class="line"><span class="comment">// start2</span></span><br><span class="line"><span class="comment">// start3</span></span><br><span class="line"><span class="comment">// next2</span></span><br><span class="line"><span class="comment">// next1</span></span><br></pre></td></tr></table></figure>
-<p>注意，这里用了两个闭包，一个维护<code>stack</code>中间件数组，一个维护中间件函数下标<code>i</code>。<br>前面看的是<code>express3</code>,后面看了<code>express4</code>源码。</p>
-<p><code>express</code> 不使用 <code>connect</code> 管理中间件了。<br>一个中间件包含一个<code>route</code> 属性，当一个请求进来时,循环所有的中间件，<code>next(router)</code> 提前退出,没有定义路由的提前退出，路径不匹配的提前退出。</p>
-<p><code>Route</code> 有 <code>stack</code> 数组，里面都是 <code>Layer</code> 实例，在解析中间件时，<code>Layer</code> 将路由路径转化为正则表达式，并将参数解析，放到他自己本身的属性上，在循环中间件时，<code>req</code> 对象上合并 <code>Layer</code>的 <code>params</code> 属性。在<code>Route.process_params</code>回调中调用 <code>Layer.handle_request</code> 执行中间件函数。</p>
-
-          
+          中间件的使用案例123456const express = require('express');const app     = express();app.use(function(req,res,next) &#123;  next()&#125;)
+以上是最简单的例子。一个中间件就是一个函数，参数为req,res,next。在这个函数中，必须执行next函数或者发送响应，否者服务会被挂起，客户端会一直处于等待。
+为什么要使用中间件在中间件中可以处理req、res对象，给他们增加新的方法和属性，供下一个中间件调用，还可以通过next控制权限，提前中断后续中间件的调用。这样的话就可以将应用的
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/23/express-middleware/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -993,74 +991,34 @@
       
         
           
-            <h3 id="进程和线程"><a href="#进程和线程" class="headerlink" title="进程和线程"></a>进程和线程</h3><p>了解进程和线程，更好的理解js单线程。</p>
-<p>官方术语</p>
-<blockquote>
-<p>进程是cpu资源（包括内存等）分配的最小单元(是能拥有资源和独立运行的最小单元)。</p>
-</blockquote>
-<blockquote>
-<p>线程是cpu调度的最小单元。</p>
-</blockquote>
-<p>cpu资源包括什么??<br>这里的调度的意思是什么??</p>
-<p>网络上看到很多次的比喻：</p>
-<blockquote>
-<p>将进程比作一个工厂，工厂和工厂直接互不影响。工厂里面有很多工人，工人相当于线程，工厂里面的电力等资源工人都可以使用，一个或多个工人合作完成任务。</p>
-</blockquote>
-<p>从上面可以得出：</p>
-<ul>
-<li>进程之间互不影响</li>
-<li>一个进程包含一个或多个线程</li>
-<li>同一个进程中的线程共享资源</li>
-</ul>
-<h3 id="浏览器的进程和线程"><a href="#浏览器的进程和线程" class="headerlink" title="浏览器的进程和线程"></a>浏览器的进程和线程</h3><p>首先浏览器是多进程的，可以打开谷歌浏览器的任务管理器查看。基本上一个标签页就是一个进程，一个插件也是一个进程，但是多个空白标签页合并为一个进程，浏览器做了优化。多进程的好处是什么呢？当一个标签页或者插件崩溃了，并不会影响到其他的进程，如果是单进程的话，只要有一个崩溃的话会影响整个浏览器。多进程充分利用多核优势。</p>
-<p>多进程为什么可以充分利用多核优势??</p>
-<h4 id="浏览器包含的进程"><a href="#浏览器包含的进程" class="headerlink" title="浏览器包含的进程"></a>浏览器包含的进程</h4><p>Browser进程：浏览器的主进程,只要一个，负责主控和协调。主要的作用跟整个浏览器相关的：</p>
-<ul>
-<li>浏览器的界面与用户的交互</li>
-<li>负责各个页面的管理，创建和销毁其他进程</li>
-<li>网络资源的管理和下载</li>
-<li>负责将Renderer进程内存里的Bitmap绘制成界面  o(╥﹏╥)o不懂啥意思</li>
-</ul>
-<p>第三方插件进程：这个比较容易理解，一个插件一个进程，仅当插件启用时才会被创建。</p>
-<p>GPU进程：最多一个，用于3D绘制。 </p>
-<p>什么是GPU？？</p>
-<p>Renderer进程：浏览器渲染进程，默认每个Tab页面一个进程，互不影响。 Renderer进程是多线程的，主要作用为页面渲染、脚本执行、事件处理等。</p>
-<h4 id="Renderer进程包含的线程"><a href="#Renderer进程包含的线程" class="headerlink" title="Renderer进程包含的线程"></a>Renderer进程包含的线程</h4><p>Renderer进程是前端关注的重点，主要包括GUI渲染线程、JS引擎线程、事件触发线程、定时器触发线程、ajax网络请求线程等。</p>
-<p>GUI渲染线程主要负责：</p>
-<ul>
-<li>HTML、CSS解析，构建DOM树和RenderObject树，布局和绘制</li>
-<li>当发生Repaint或者reflow时，该线程就是执行</li>
-<li>GUI渲染线程和JS引擎线程是互斥的，这两个线程同时只有一个线程运行</li>
-</ul>
-<p>JS引擎线程主要作用：</p>
-<ul>
-<li>负责执行javascript脚本</li>
-<li>等待任务队列的任务触发，一个Renderer进程只有一个JS线程在运行JS程序。</li>
-<li>JS引擎线程和GUI渲染线程是互斥的</li>
-</ul>
-<p>事件触发线程主要作用：</p>
-<ul>
-<li>用来控制事件循环</li>
-<li>当JS引擎执行<code>setTimeout</code>、发送Ajax，绑定事件响应等，会将对应的任务添加到该线程</li>
-<li>当对应的事件符合触发条件时，该线程会把事件添加到任务队列的末尾，等待JS引擎空闲时执行。</li>
-</ul>
-<p>定时器触发线程：</p>
-<ul>
-<li>setTimeout 和setInterval所在线程</li>
-<li>因为JS是单线程的，如果处于阻塞线程状态，会影响计时的准确性，所以另开线程。</li>
-<li>计时完毕后，会将事件添加到任务队列的末尾，等待JS引擎空闲时执行。</li>
-</ul>
-<p>ajax网络请求线程:</p>
-<ul>
-<li>在XMLHttpRequest请求连接成功后，浏览器新开一个线程请求</li>
-<li>在状态请求状态变更时，会产生状态变更事件，将回调函数放在任务队列的末尾，等待JS引擎空闲时执行。</li>
-</ul>
-<h3 id="js为什么是单线程"><a href="#js为什么是单线程" class="headerlink" title="js为什么是单线程"></a>js为什么是单线程</h3><p>其实这与它的用途有关。作为浏览器脚本语言，JavaScript 的主要用途是与用户互动，以及操作 DOM。若以多线程的方式操作这些 DOM，则可能出现操作的冲突。假设有两个线程同时操作一个 DOM 元素，线程 1 要求浏览器删除 DOM，而线程 2 却要求修改 DOM 样式，这时浏览器就无法决定采用哪个线程的操作。当然，我们可以为浏览器引入“锁”的机制来解决这些冲突，但这会大大提高复杂性，所以 <code>JavaScript</code> 从诞生开始就选择了单线程执行。</p>
-<p>setTimeout 只是将事件插入到<code>task queue</code>,必须等到<code>execution context stack</code>(执行栈) 执行完成,<br>主线程才会去执行指定的回调函数。所以当程序耗时很长时，并不能保证setTimeout能够在指定时间执行。比如：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'start'</span>);</span><br><span class="line">&#125;,<span class="number">0</span>)</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="number">100000</span>; i++) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>并不能保证在0 ms 之后打印 start并且<code>setTimeout</code>最短间隔不得低于 4ms，低于这个值会自动增加。<br><code>setTimeout(fn,0)</code>的意思是让<code>fn</code>在主线程最早有空闲的时候执行。<br>在<code>vue</code>中，数据的改变并不会马上触发<code>Dom</code>元素的更新，需要使用<code>$nextTick</code>或者<code>setTimeout(fn,0)</code>,保证可以获取到更新后的<code>DOM</code>元素</p>
-<h3 id="nodejs中的event-loop"><a href="#nodejs中的event-loop" class="headerlink" title="nodejs中的event-loop"></a>nodejs中的event-loop</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">2</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">4</span>);</span><br><span class="line">process.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">5</span>);</span><br><span class="line">  process.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">6</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">7</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line">setImmediate(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">8</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+          进程和线程了解进程和线程，更好的理解js单线程。
+官方术语
 
-          
+进程是cpu资源（包括内存等）分配的最小单元(是能拥有资源和独立运行的最小单元)。
+
+
+线程是cpu调度的最小单元。
+
+cpu资源包括什么??这里的调度的意思是什么??
+网络上看到很多次的比喻：
+
+将进程比作一个工厂，工厂和工厂直接互不影响。工厂里面有很多工人，工人相当于线程，工厂里面的电力等资源工人都可以使用，一个或多个工人合作完成任务。
+
+从上面可以得出：
+
+进程之间互不影响
+一个进程包含一个或多个线程
+同一个进程中的线程共享资源
+
+浏览器的进程和线程首先浏览器是多进程的，可以打开谷歌浏览器的任务管理器查看。基本上一个标签页就是
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/19/javascript-event-loop/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1189,10 +1147,17 @@
       
         
           
-            <p>开发使用jetbrain开发工具，经常会改动配置文件，比如：修改快捷键、代码段、文件模板等，需要同步公司和个人电脑的配置。最开始使用的是Dropbox同步配置文件，每次改动都需要导出，然后每个编辑器再导入，非常麻烦，效率很低。今天发现webstrom等自动设置同步插件，只有设置一个同步仓库，每次IDE启动、退出时默认同步配置，非常的方便。</p>
-<p>这个插件的名字 <code>settings repository</code>,一般自带这个插件，没有的话到插件中心下载就好了。<br>这个是详细的介绍地址 <a href="https://www.jetbrains.com/help/webstorm/settings-repository.html" target="_blank" rel="noopener">Settings Repository</a></p>
+          开发使用jetbrain开发工具，经常会改动配置文件，比如：修改快捷键、代码段、文件模板等，需要同步公司和个人电脑的配置。最开始使用的是Dropbox同步配置文件，每次改动都需要导出，然后每个编辑器再导入，非常麻烦，效率很低。今天发现webstrom等自动设置同步插件，只有设置一个同步仓库，每次IDE启动、退出时默认同步配置，非常的方便。
+这个插件的名字 settings repository,一般自带这个插件，没有的话到插件中心下载就好了。这个是详细的介绍地址 Settings Repository
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/19/jetbrain-setting/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1343,11 +1308,18 @@
       
         
           
-            <p>今天在网上看到一篇文章<a href="http://www.cnblogs.com/leezhxing/p/4105167.html" target="_blank" rel="noopener">JavaScript数据操作–原始值和引用值的操作本质</a>,<br>我觉得写得很好，刚好学习一下，补补漏。</p>
-<p><strong>原始值不管是赋值还是函数参数传递，都不会改变原值，引用值不管是赋值还是函数参数传递，只要新变量被覆盖，就不会影响原值，如果是对新变量直接修改，就会改变原值。</strong></p>
-<p>这句话怎么理解呢？我是这么理解的：原始值是值得复制，将原始值复制给了一个新的变量。引用值呢，只要新变量和引用值之间的引用关系断掉了，那么新变量的改变不会影响原值，因为操作的不是同一个地址中的数据呀。什么情况会造成引用关系断掉呢？就是给新变量赋了一个新的值。</p>
+          今天在网上看到一篇文章JavaScript数据操作–原始值和引用值的操作本质,我觉得写得很好，刚好学习一下，补补漏。
+原始值不管是赋值还是函数参数传递，都不会改变原值，引用值不管是赋值还是函数参数传递，只要新变量被覆盖，就不会影响原值，如果是对新变量直接修改，就会改变原值。
+这句话怎么理解呢？我是这么理解的：原始值是值得复制，将原始值复制给了一个新的变量。引用值呢，只要新变量和引用值之间的引用关系断掉了，那么新变量的改变不会影响原值，因为操作的不是同一个地址中的数据呀。什么情况会造成引用关系断掉呢？就是给新变量赋了一个新的值。
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/27/reference-or-value-javascript/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1476,16 +1448,17 @@
       
         
           
-            <p>以前博客通过github page搭建的，访问速度不快，就想着搭建在自己的服务器上。虽然服务器只是 1 核 1 G 的，但是还是能跑很多应用的。</p>
-<h3 id="nginx配置"><a href="#nginx配置" class="headerlink" title="nginx配置"></a>nginx配置</h3><p>博客设置了3个域名访问，配置如下：<br>/etc/nginx/conf.d/blog.conf</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server&#123;</span><br><span class="line">	listen 80;</span><br><span class="line">	server_name www.ltinyho.top blog.ltinyho.top ltinyho.top;</span><br><span class="line">	root /home/ltinyho/project/ltinyho.blog.io;</span><br><span class="line">	location / &#123;</span><br><span class="line">		index index.html;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>sudo nginx -s reload</code> 成功访问</p>
-<p>本来想用docker-compose 启动nginx服务的，但是出现nginx出现connet fail 111错误，应该是docker网络的问题，一时搞不定。<br>待以后好好学习下docker。</p>
-<h3 id="启动webhook服务"><a href="#启动webhook服务" class="headerlink" title="启动webhook服务"></a>启动webhook服务</h3><p>基本思路就是hexo deploy时，生成的静态网站会push代码到博客仓库，触发webhook，调用配置的wehook url，执行git pull，拉取最新的代码。</p>
-<h3 id="碰到的问题"><a href="#碰到的问题" class="headerlink" title="碰到的问题"></a>碰到的问题</h3><p>我的代码仓库是放在mac的移动硬盘上的，创建的脚本文件默认有777的权限，而且用chmod不能更改，但是在服务器上的脚本没有执行权限。<br>解决方法是在mac的系统盘上增加脚本的执行权限。</p>
-<p>其中webhook服务我是用docker跑的，但是在docker里面不能执行宿主机的脚本。看到过一种解决方案，使用ssh登录宿主机，然后执行脚本。<br>我的方案是启动了一个deploy服务，然后请求这个服务执行对应的脚本。注意，这个deploy服务不能使用docker跑，要不然还是一样不能执行宿主机的脚本。<br>我使用pm2启动deploy服务，执行对应的脚本。注意设置pm2启动的服务开机自启动。</p>
-
-          
+          以前博客通过github page搭建的，访问速度不快，就想着搭建在自己的服务器上。虽然服务器只是 1 核 1 G 的，但是还是能跑很多应用的。
+nginx配置博客设置了3个域名访问，配置如下：/etc/nginx/conf.d/blog.conf
+12345678server&#123;	listen 80;	server_name www.ltinyho.top blog.ltinyho.top ltinyho.top;	root /home/ltinyho/project/ltinyho.blog.io;	location / &#123;		index index.html;	&#12
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/25/git+webhooks-deploy/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1636,24 +1609,18 @@
       
         
           
-            <p>今天在<code>gitchat</code>上看的一篇文章，(从工程师到技术管理，我和研发团队如何在9个月内实现逆袭)[<a href="http://gitbook.cn/books/59007357ff8adf3464a00028/index.html]。" target="_blank" rel="noopener">http://gitbook.cn/books/59007357ff8adf3464a00028/index.html]。</a><br>里面谈到很多关于团队和个人发展的问题。作者作为一个空降领导，如何融入团队，了解团队工作、团队成员，推动项目的进行，为下属争取晋升和利益。将团队打造成利益共同体，统一团队目标。从繁杂的琐碎的业务工作抽身出来，将更多的时间放在研发上，技术推动业务的发展。</p>
-<p>文章中提到技术驱动，作者的观点是：</p>
-<blockquote>
-<p>首先，所有的公司从根本上都是业务驱动的，我们看到的技术驱动是因为其业务本身就是技术。正因如此，研发团队需要认清自己的定位，从一般意义上的需求实现者转变为业务的合作伙伴——要关注业务的运营。而这个定位也要明晰研发（或技术）所具备的优势，而这些优势不但可以预防业务过度关注短期利益而损害长期的机会，而且可以帮助业务构筑效率和新模式上的竞争优势，从这个角度，技术可以反推业务前进，实现驱动力。</p>
-</blockquote>
-<p>特别赞同从业务的实现者转为业务的合作者。</p>
-<p>作者还提到研发的优势在于工具、数据和模型，可以将优势应用于业务和研发自身，包括：</p>
-<ul>
-<li>提供工具简化操作</li>
-<li>提供自动化，提高业务效率</li>
-<li>通过数据发现问题和机遇，为业务决策和优化提供依据。</li>
-<li>通过模型和工具使决策本身自动化</li>
-</ul>
-<p>上面一、二两点对我来说比较好理解，三、四两点没有太大的概念和手段。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>什么是优秀技术管理者最需要关注的呢？我觉得是成事的能力，而这种能力中，除去一定的技术能力外，情商和做事方法是至关重要的方面。<br>技术管理者需要建立起业务和研发的高效生产和反馈闭环，在实践中，不但要将自己和团队的定位从需求实现者转变为业务的合作伙伴，更甚至成为亚马逊那样的客户至上的践行者。<br>技术管理者要建立良好的服务意识并长期关注效率。</p>
-<p>不同的企业文化和制度中，有些严格，它们强调帮助个体明确目标、限制惰性，或激发个体的内在驱动力，而有些则更为舒适，期望给创造性的工作一个宽松的环境。<br>做为技术管理者，必须担负起人员培养的责任，为了帮助团队成员成长，适当挑战甚至严格要求是必须的，甚至有时出于对团队和当事人负责，迅速解决能力不适合的团队成员也是必须的。尤其对于后者，有些敏捷教练的那种不抛弃不放弃的鸡汤文化真是相当幼稚。《从优秀到卓越》就严格有很好的论述，而网上很多探讨“严格是大爱”的文章写得也很到位。总的来说，优秀的技术管理者对于严格的看法，要有”以雷霆手段，显菩萨心肠“的觉悟。</p>
+          今天在gitchat上看的一篇文章，(从工程师到技术管理，我和研发团队如何在9个月内实现逆袭)[http://gitbook.cn/books/59007357ff8adf3464a00028/index.html]。里面谈到很多关于团队和个人发展的问题。作者作为一个空降领导，如何融入团队，了解团队工作、团队成员，推动项目的进行，为下属争取晋升和利益。将团队打造成利益共同体，统一团队目标。从繁杂的琐碎的业务工作抽身出来，将更多的时间放在研发上，技术推动业务的发展。
+文章中提到技术驱动，作者的观点是：
 
-          
+首先，所有的公司从根本上都是业务驱动的，我们看到的技术驱动是因为其业务本身就是技术。正因如此
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/12/20/technology-driven/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1782,10 +1749,16 @@
       
         
           
-            <h3 id="stack"><a href="#stack" class="headerlink" title="stack"></a>stack</h3><h3 id="dequeue"><a href="#dequeue" class="headerlink" title="dequeue"></a>dequeue</h3><h4 id="priority-queue"><a href="#priority-queue" class="headerlink" title="priority-queue"></a>priority-queue</h4><p>优先队列<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> isAdded = <span class="literal">false</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">let</span> i=<span class="number">0</span>;i&lt;queue.length;i++)&#123;</span><br><span class="line">    <span class="keyword">if</span>(element.priority&lt; queue[i].priority)&#123;</span><br><span class="line">        items.splice(i,<span class="number">0</span>,element)</span><br><span class="line">        isAdded = <span class="literal">true</span></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!isAdded)&#123;</span><br><span class="line">  items.push(element)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="circular-queue"><a href="#circular-queue" class="headerlink" title="circular-queue"></a>circular-queue</h4><p>循环队列</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">queue.enqueue(queue.dequeue)</span><br></pre></td></tr></table></figure>
-          
+          stackdequeuepriority-queue优先队列123456789101112let isAdded = falsefor(let i=0;i&lt;queue.length;i++)&#123;    if(element.priority&lt; queue[i].priority)&#123;        items.splice(i,0,element)        isAdded = true        break    &#125;&#125;if(!isAdded)&#123;  items.push(element)&#125;
+circular-queue
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/12/18/data-stuct/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
