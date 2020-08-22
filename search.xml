@@ -1,9 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[内网穿透搭建 k8s 服务]]></title>
+    <url>%2F2020%2F01%2F13%2Ffrp-to-local-k8s%2F</url>
+    <content type="text"><![CDATA[最近配了一台服务器,配置清单cpu: e2660、内存: 16*2 ecc。使用 proxmox 安装了多台虚拟机,使用其中的 3 台 4c 8g 的搭建了一个 3 节点的 k8s 集群。因为没有公网 ip或者说进不了电信光猫改不了配置,不能直接通过公网访问到内网，所以使用 frp 内网穿透，提供公网访问。预期实现的功能： 可通过域名直接访问内网，不带端口，eg: http://ltinyho.top 支持 https, eg: https://ltinyho.top 支持 websocket 内网穿透配置 将域名绑定到具有公网ip的服务器 将80和443端口的流量转发到 fprs http监听的 7080端口。这样流量就会通过 frps -&gt; frpc 到内网宿主机。 将配置的域名的流量都转到本地的 80 端口。 反向代理，将流量代理到 k8s 集群配置 公网服务器nginx配置 12345678910111213141516171819202122map $http_upgrade $connection_upgrade &#123; default upgrade; &apos;&apos; close;&#125;server &#123; listen 80; server_name *.ltinyho.top ltinyho.top; listen 443 ssl; # managed by Certbot ssl_certificate /etc/letsencrypt/live/ltinyho.top/fullchain.pem; # managed by Certbot ssl_certificate_key /etc/letsencrypt/live/ltinyho.top/privkey.pem; # managed by Certbot include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot location / &#123; proxy_pass http://localhost:7080; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_http_version 1.1; proxy_set_header Upgrade $http_upgrade; #配置weboscket proxy_set_header Connection $connection_upgrade;#配置weboscket &#125;&#125; fprs 配置 12345bind_addr = 0.0.0.0bind_port = 7000bind_udp_port = 7001kcp_bind_port = 7000vhost_http_port = 7080 内网 frpc 配置1234567891011121314151617181920upstream k8s &#123; server 192.168.199.111:80; server 192.168.199.112:80; server 192.168.199.113:80;&#125;map $http_upgrade $connection_upgrade &#123; default upgrade; &apos;&apos; close;&#125;server &#123; listen 80; server_name *.ltinyho.top ltinyho.top; location / &#123; proxy_pass http://k8s; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection $connection_upgrade; &#125;&#125; 内网宿主机nginx配置 12345678910[common]server_addr = 47.98.137.255server_port = 7000[lt-http]type = httplocal_ip = 127.0.0.1local_port = 80custom_domains = *.ltinyho.top,ltinyho.topremote_port = 7080 https 证书通过 letsencrypt 申请的]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>k8s</tag>
+        <tag>nginx</tag>
+        <tag>frp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[nginx 配置]]></title>
+    <url>%2F2020%2F01%2F11%2Fnginx-config%2F</url>
+    <content type="text"><![CDATA[nginx 配置 websocket123456map $http_upgrade $connection_upgrade &#123; default upgrade; &apos;&apos; close;&#125;proxy_set_header Upgrade $http_upgrade;proxy_set_header Connection $connection_upgrade; nginx 配置负载均衡12345678910111213141516upstream k8s &#123; server 192.168.199.111:80; server 192.168.199.112:80; server 192.168.199.113:80;&#125;server &#123; listen 80; server_name *.ltinyho.top ltinyho.top; location / &#123; proxy_pass http://k8s; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection $connection_upgrade; &#125;&#125; 参考: https://www.nginx.com/blog/websocket-nginx/ 安装指定版本的nginx nginx 配置example]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>nginx</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[tcp keepalive in go]]></title>
     <url>%2F2019%2F11%2F04%2Ftcp-keepalive%2F</url>
     <content type="text"><![CDATA[http 1.1 默认开启了 tcp keepalive,复用 tcp 连接. go 中发起 http 请求,如何使用 keepalive 呢?1234567891011121314151617181920package mainvar ( QHTTPTransport http.RoundTripper = &amp;http.Transport&#123; Proxy: http.ProxyFromEnvironment, DialContext: (&amp;net.Dialer&#123; Timeout: 30 * time.Second, KeepAlive: 30 * time.Second, DualStack: true, &#125;).DialContext, MaxIdleConns: 100, MaxIdleConnsPerHost: 5, IdleConnTimeout: 90 * time.Second, TLSHandshakeTimeout: 10 * time.Second, ExpectContinueTimeout: 1 * time.Second, &#125; QHTTPClient = &amp;http.Client&#123; Transport: QHTTPTransport, &#125;) 发起 http 请求时,使用 QHTTPClient.go 服务端 http.ListenAndServe(&quot;:8080&quot;,nil) 默认开启了 keepalive. 使用 man 7 tcp查看 tcp_keepalive_time,默认保持时间是 7200秒,tcp_keepalive_intvl默认是 75秒自定义:1234 srv := http.Server&#123; Handler: mux,&#125;srv.SetKeepAlivesEnabled(false) 或者自定义 listener12345678910111213141516type tcpKeepAliveListener struct &#123; *net.TCPListener&#125;func (ln tcpKeepAliveListener) Accept() (net.Conn, error) &#123; tc, err := ln.AcceptTCP() if err != nil &#123; return nil, err &#125; tc.SetKeepAlive(true) tc.SetKeepAlivePeriod(time.Second*10) // 设置 keepalive period return tc, nil&#125;func main()&#123; err = srv.Serve(tcpKeepAliveListener&#123;ln.(*net.TCPListener)&#125;)&#125; gin 框架自定义 keepalive12345678router := gin.Default() s := &amp;http.Server&#123; Addr: ":8080", Handler: router, // &lt; here Gin is attached to the HTTP server &#125; s.SetKeepAlivesEnabled(false) s.ListenAndServe()]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>go</tag>
+        <tag>tcp</tag>
+      </tags>
   </entry>
   <entry>
     <title><![CDATA[Diffie–Hellman 密钥交换协议]]></title>
@@ -272,17 +303,17 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[风险 投资 劳动]]></title>
-    <url>%2F2017%2F12%2F17%2Frisk-invest-work%2F</url>
-    <content type="text"><![CDATA[今天在知乎上看到一篇文章里面提到对收入的影响,风险 &gt; 资本 &gt; 劳动。 风险投资行业风险最高的天使轮投资,为idea买单,当然成功收益也很高。这个需要资本。 资本资本，通过资本收益，比如：房租，利息等被动收入。创办公司，自己当老板。 劳动劳动，需要掌握一定的技能，通过出售自己的技能，时间来获得收入。当然，这种风险是较小的。公司的大部分收入是员工来创造的，但是公司老板的收入是最高的。当企业经营不善时，员工是没有任何风险的，大不了公司倒闭换个公司继续工作，而老板承担的风险是最高的，他的资本投入都会赔掉。 总结通过劳动实现财富的原始积累，通过资本的被动收入实现财务自由。]]></content>
-  </entry>
-  <entry>
     <title><![CDATA[保持学习]]></title>
     <url>%2F2017%2F12%2F17%2Fkeep-study%2F</url>
     <content type="text"><![CDATA[今天看了gitchat上的文章，做做笔记。 文章： 不走弯路的五大学习策略 升职加薪：8小时之外的人生 学习的三个维度 学习 = 学 + 习 学是容易获得成就感的，实践相对来说更枯燥一些，光学不练的学习都是假学习。 学习 = 动机 + 内容 + 交互 增强动机学习之前先思考一下： 为什么学呀 学了可以干啥 不学会怎样啊 动力不足的话可以先YY一下，学成之后的情景。这样可以增强自己的冬季，也可以避免盲目的学习。 精选内容「N 手知识」概念？ 一手知识来自于一线专家，通过和他们交流，或者读他们的论文来学习。 二手知识是发明某个理论的专家亲自写的书。 三手知识是其他人读了专家的书之后翻译成大家都能懂的语言的畅销书，或者培训师通过故事案例来传递的知识。 四手知识是某些人为了实现某种目的而写的免费文章，常常断章取义。 要看自己更容易消化哪种知识，在不同的阶段，是不一样的。 适合自己的知识才是最好的 联机交互在完成知识的原始积累的情况下，跟他人讨论学习。 学习的效率 效率 = 收益 / 资源 高效学习，不是指高效率学习，也不是快速学习，而是高效益。学习的效益等于获得收益除以投入的资源（时间、金钱、精力）。 放大收益学习做产品，把自己的能力包装成产品，卖给更多的人，卖的更贵。 学习一下写作、演讲和培训通用的技能，不管的那个领域的知识，都可以通过写作、演讲和培训来放大收益。 匹配资源针对不同的学习材料，需要投入的时间和精力是不一样的。学习材料分级：认知型，知识型，娱乐型。 认知型 适合精力充沛时花整段的时间来学习的知识，比如：编程、数学、英语 知识型 适合精力较好，碎片化的时间，阅读一些知识型的材料，比如：产品、消费者心理学 娱乐型 适合饭后，晚上精力比较差，时间也比较碎时浏览的内容，比如：社交媒体、博客订阅 总结增强动机： 列举正在学习的一项技能的愿景、价值和规条 列举兴趣清单 记录问题清单 精选内容： 尝试读一篇论文 找到编程领域的知识源头 联机交互： 梳理联机学习者清单 尝试组织或参加一次私董会 加入 1 个学习社群 放大收益： 开始写文章发布到简书 列举输出渠道清单 发布一场 GitChat 匹配资源： 明天尝试早起学习 将书架上的书分成认知型、知识型、娱乐型三类 8小时之外如何成长： 端正自己的心态，学到的都是自己的，好相处 知其然，更要知其所以然，工作可以先完成，后面还是要搞懂为什么 主动发现问题并解决 跟上公司的发展，提前学习]]></content>
       <tags>
         <tag>study</tag>
       </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[风险 投资 劳动]]></title>
+    <url>%2F2017%2F12%2F17%2Frisk-invest-work%2F</url>
+    <content type="text"><![CDATA[今天在知乎上看到一篇文章里面提到对收入的影响,风险 &gt; 资本 &gt; 劳动。 风险投资行业风险最高的天使轮投资,为idea买单,当然成功收益也很高。这个需要资本。 资本资本，通过资本收益，比如：房租，利息等被动收入。创办公司，自己当老板。 劳动劳动，需要掌握一定的技能，通过出售自己的技能，时间来获得收入。当然，这种风险是较小的。公司的大部分收入是员工来创造的，但是公司老板的收入是最高的。当企业经营不善时，员工是没有任何风险的，大不了公司倒闭换个公司继续工作，而老板承担的风险是最高的，他的资本投入都会赔掉。 总结通过劳动实现财富的原始积累，通过资本的被动收入实现财务自由。]]></content>
   </entry>
   <entry>
     <title><![CDATA[解决单页面应用微信浏览器后台加载视频]]></title>
