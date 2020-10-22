@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[删除 git 提交的 bin 文件]]></title>
+    <url>%2F2020%2F10%2F22%2Fremove-git-bin-file%2F</url>
+    <content type="text"><![CDATA[go build 生成的二进制文件被增加到 git 提交记录里面,需要在历史记录清除. 使用 bfg 工具清除 工具下载: https://rtyley.github.io/bfg-repo-cleaner/#download 12345678# clone 项目 注意加上 --mirrorgit clone https://gogs.***.cn/sg/bs.git --mirror # 清除历史文件java -jar bfg-1.13.0.jar --delete-files rmi ../work/sg/bs.gitgit reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressivegit push]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[无锁缓存]]></title>
+    <url>%2F2020%2F08%2F22%2Fno-lock-cache%2F</url>
+    <content type="text"><![CDATA[场景高并发写多读少的场景下,对 map 的写需要加锁,急剧影响性能. 解决方案方案1 | 单库变多库.123456789101112131415161718192021222324252627282930313233343536373839404142434445package mainimport ( "sync")type driverInfo struct &#123; id int age int&#125;type company struct &#123; lock []sync.RWMutex driver map[int]map[int]*driverInfo count int&#125;func newCompany(count int) *company &#123; lock := make([]sync.RWMutex, count) driver := make(map[int]map[int]*driverInfo, count) for i := 0; i &lt; count; i++ &#123; lock[i] = sync.RWMutex&#123;&#125; driver[i] = make(map[int]*driverInfo) &#125; return &amp;company&#123; lock: lock, count: count, driver: driver, &#125;&#125;func (c *company) getDriver(id int) (derive *driverInfo) &#123; i := id % c.count c.lock[i].RLock() defer c.lock[i].RUnlock() return c.driver[i][id]&#125;func (c *company) setDriver(driver *driverInfo) &#123; i := driver.id % c.count c.lock[i].Lock() defer c.lock[i].Unlock() c.driver[i][driver.id] = driver&#125; 方案 2 | 库变表跟方案 1 类似,减小锁的粒度到字段.潜在的问题是当数据量过大的,锁需要占用大量内存. 方案 3 | 不加锁, 加签名校验数据的合法性在并发场景下,对同一个值的修改,数据的完整性不能保证.对 key 的 val1,val2 的写入,可能写入val1 成功一半,val2 成功一半,即 val1 half+ val2 half.为了保证数据的正确性.可以在数据的末尾增加 crc32 校验,计算数据的签名.取出数据时,需要校验签名是否正确.签名不正确,直接丢弃,从数据库拉取. 参考链接 [无锁缓存，每秒10万并发，究竟如何实现？]https://mp.weixin.qq.com/s/BfuRWaB7RDjpGmQbZdmMZw]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>go</tag>
+        <tag>cache</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[内网穿透搭建 k8s 服务]]></title>
     <url>%2F2020%2F01%2F13%2Ffrp-to-local-k8s%2F</url>
     <content type="text"><![CDATA[最近配了一台服务器,配置清单cpu: e2660、内存: 16*2 ecc。使用 proxmox 安装了多台虚拟机,使用其中的 3 台 4c 8g 的搭建了一个 3 节点的 k8s 集群。因为没有公网 ip或者说进不了电信光猫改不了配置,不能直接通过公网访问到内网，所以使用 frp 内网穿透，提供公网访问。预期实现的功能： 可通过域名直接访问内网，不带端口，eg: http://ltinyho.top 支持 https, eg: https://ltinyho.top 支持 websocket 内网穿透配置 将域名绑定到具有公网ip的服务器 将80和443端口的流量转发到 fprs http监听的 7080端口。这样流量就会通过 frps -&gt; frpc 到内网宿主机。 将配置的域名的流量都转到本地的 80 端口。 反向代理，将流量代理到 k8s 集群配置 公网服务器nginx配置 12345678910111213141516171819202122map $http_upgrade $connection_upgrade &#123; default upgrade; &apos;&apos; close;&#125;server &#123; listen 80; server_name *.ltinyho.top ltinyho.top; listen 443 ssl; # managed by Certbot ssl_certificate /etc/letsencrypt/live/ltinyho.top/fullchain.pem; # managed by Certbot ssl_certificate_key /etc/letsencrypt/live/ltinyho.top/privkey.pem; # managed by Certbot include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot location / &#123; proxy_pass http://localhost:7080; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_http_version 1.1; proxy_set_header Upgrade $http_upgrade; #配置weboscket proxy_set_header Connection $connection_upgrade;#配置weboscket &#125;&#125; fprs 配置 12345bind_addr = 0.0.0.0bind_port = 7000bind_udp_port = 7001kcp_bind_port = 7000vhost_http_port = 7080 内网 frpc 配置1234567891011121314151617181920upstream k8s &#123; server 192.168.199.111:80; server 192.168.199.112:80; server 192.168.199.113:80;&#125;map $http_upgrade $connection_upgrade &#123; default upgrade; &apos;&apos; close;&#125;server &#123; listen 80; server_name *.ltinyho.top ltinyho.top; location / &#123; proxy_pass http://k8s; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection $connection_upgrade; &#125;&#125; 内网宿主机nginx配置 12345678910[common]server_addr = 47.98.137.255server_port = 7000[lt-http]type = httplocal_ip = 127.0.0.1local_port = 80custom_domains = *.ltinyho.top,ltinyho.topremote_port = 7080 https 证书通过 letsencrypt 申请的]]></content>

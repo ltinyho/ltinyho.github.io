@@ -2,6 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.ltinyho.top/2020/10/22/remove-git-bin-file/</loc>
+    
+    <lastmod>2020-10-22T10:48:36.637Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.ltinyho.top/2018/02/25/git+webhooks-deploy/</loc>
+    
+    <lastmod>2020-10-17T07:23:34.863Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.ltinyho.top/others/2020-resume.html</loc>
+    
+    <lastmod>2020-09-06T08:48:26.979Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.ltinyho.top/2020/08/22/no-lock-cache/</loc>
+    
+    <lastmod>2020-08-22T08:40:52.944Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.ltinyho.top/others/2020-01-19%2014:16:24.html</loc>
     
     <lastmod>2020-01-19T06:16:41.673Z</lastmod>
@@ -26,13 +54,6 @@
     <loc>http://blog.ltinyho.top/2020/01/11/nginx-config/</loc>
     
     <lastmod>2020-01-15T02:31:14.748Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.ltinyho.top/others/gin-context-goroutine.html</loc>
-    
-    <lastmod>2020-01-09T04:33:08.392Z</lastmod>
     
   </url>
   
@@ -135,14 +156,14 @@
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2018/02/27/reference-or-value-javascript/</loc>
+    <loc>http://blog.ltinyho.top/2018/12/04/remove-file/</loc>
     
     <lastmod>2019-08-18T07:19:56.373Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2018/12/04/remove-file/</loc>
+    <loc>http://blog.ltinyho.top/2018/02/27/reference-or-value-javascript/</loc>
     
     <lastmod>2019-08-18T07:19:56.373Z</lastmod>
     
@@ -156,13 +177,6 @@
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2019/02/27/service-problem-record/</loc>
-    
-    <lastmod>2019-08-18T07:19:56.373Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://blog.ltinyho.top/2018/05/29/setTimeout-setImmediate-process.nextTick/</loc>
     
     <lastmod>2019-08-18T07:19:56.373Z</lastmod>
@@ -170,7 +184,7 @@
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2018/12/02/shell-study/</loc>
+    <loc>http://blog.ltinyho.top/2019/02/27/service-problem-record/</loc>
     
     <lastmod>2019-08-18T07:19:56.373Z</lastmod>
     
@@ -178,6 +192,13 @@
   
   <url>
     <loc>http://blog.ltinyho.top/2018/11/25/share-think/</loc>
+    
+    <lastmod>2019-08-18T07:19:56.373Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.ltinyho.top/2018/12/02/shell-study/</loc>
     
     <lastmod>2019-08-18T07:19:56.373Z</lastmod>
     
@@ -226,7 +247,7 @@
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2017/09/11/npm-private-package-via-git/</loc>
+    <loc>http://blog.ltinyho.top/2018/11/08/mysql-backup/</loc>
     
     <lastmod>2019-08-18T07:19:56.372Z</lastmod>
     
@@ -240,14 +261,14 @@
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2018/11/08/mysql-backup/</loc>
+    <loc>http://blog.ltinyho.top/2018/03/25/promise/</loc>
     
     <lastmod>2019-08-18T07:19:56.372Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2018/03/25/promise/</loc>
+    <loc>http://blog.ltinyho.top/2017/09/11/npm-private-package-via-git/</loc>
     
     <lastmod>2019-08-18T07:19:56.372Z</lastmod>
     
@@ -268,7 +289,7 @@
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2018/02/25/git+webhooks-deploy/</loc>
+    <loc>http://blog.ltinyho.top/2018/03/23/express-middleware/</loc>
     
     <lastmod>2019-08-18T07:19:56.371Z</lastmod>
     
@@ -283,13 +304,6 @@
   
   <url>
     <loc>http://blog.ltinyho.top/2019/06/01/go-retry/</loc>
-    
-    <lastmod>2019-08-18T07:19:56.371Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.ltinyho.top/2018/03/23/express-middleware/</loc>
     
     <lastmod>2019-08-18T07:19:56.371Z</lastmod>
     
@@ -317,6 +331,13 @@
   </url>
   
   <url>
+    <loc>http://blog.ltinyho.top/2018/03/19/jetbrain-setting/</loc>
+    
+    <lastmod>2019-08-18T07:19:56.371Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.ltinyho.top/2017/12/17/keep-study/</loc>
     
     <lastmod>2019-08-18T07:19:56.371Z</lastmod>
@@ -324,9 +345,9 @@
   </url>
   
   <url>
-    <loc>http://blog.ltinyho.top/2018/03/19/jetbrain-setting/</loc>
+    <loc>http://blog.ltinyho.top/2017/06/25/css-layout/</loc>
     
-    <lastmod>2019-08-18T07:19:56.371Z</lastmod>
+    <lastmod>2019-08-18T07:19:56.370Z</lastmod>
     
   </url>
   
@@ -339,13 +360,6 @@
   
   <url>
     <loc>http://blog.ltinyho.top/2017/12/18/data-stuct/</loc>
-    
-    <lastmod>2019-08-18T07:19:56.370Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.ltinyho.top/2017/06/25/css-layout/</loc>
     
     <lastmod>2019-08-18T07:19:56.370Z</lastmod>
     
