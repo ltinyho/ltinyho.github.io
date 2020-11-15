@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[从程序员到架构师，从架构师到CTO (笔记)]]></title>
+    <url>%2F2020%2F11%2F15%2Farchitect-ability%2F</url>
+    <content type="text"><![CDATA[洪强宁：从程序员到架构师，从架构师到CTO 优秀架构师的能力： 取舍 不同业务场景的需求和关注点不同，导致架构设计也是不同的。比如：在线直播关注时延，安全，离线业务关注吞吐率，基于不同场景做取舍。 前瞻 对未来不确定的事情提前做考虑.既有技术上的发展,也要有基于业务发展的考虑. 抽象 软件开发是复杂的,需要识别复杂度的来源,分层抽象隔离复杂度.系统全局视角,组件角色定义,不过早进入组件细节中.(写业务代码也是一样,先写伪代码,在实现细节.) 容错后端开发是面向错误的开发.架构师所处的环境就更恶劣了.第一,面向错误设计,事前先做解决方案(解决方案需要事前做好演练,不能等出现问题才发现方案有问题).第二个问题是数据做好备份,没有备份的日子总是提心吊胆.第三,出现故障时如何处理?只换不修,快速切换到正常状态.]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>架构</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[删除 git 提交的 bin 文件]]></title>
     <url>%2F2020%2F10%2F22%2Fremove-git-bin-file%2F</url>
     <content type="text"><![CDATA[go build 生成的二进制文件被增加到 git 提交记录里面,需要在历史记录清除. 使用 bfg 工具清除 工具下载: https://rtyley.github.io/bfg-repo-cleaner/#download 12345678# clone 项目 注意加上 --mirrorgit clone https://gogs.***.cn/sg/bs.git --mirror # 清除历史文件java -jar bfg-1.13.0.jar --delete-files rmi ../work/sg/bs.gitgit reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressivegit push]]></content>

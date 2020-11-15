@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.ltinyho.top/2020/11/15/architect-ability/</loc>
+    
+    <lastmod>2020-11-15T03:13:34.259Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.ltinyho.top/others/k8s-dns.html</loc>
+    
+    <lastmod>2020-10-24T08:13:03.115Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.ltinyho.top/2020/10/22/remove-git-bin-file/</loc>
     
     <lastmod>2020-10-22T10:48:36.637Z</lastmod>
