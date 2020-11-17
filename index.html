@@ -1754,6 +1754,28 @@ w 发生在 r之前
           </span>
 
           
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/后盾/" itemprop="url" rel="index">
+                    <span itemprop="name">后盾</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -1804,11 +1826,7 @@ w 发生在 r之前
 上线迁移分表数量规划
 
 现有 6000w 数据是 3-4 年的积累, 规划为 单表上线为 500w,现在业务高速发展的时期,希望能支撑未来 2-3 年的使用,取 2^5=32 张表,可容纳的总数据量为 32*500w= 1.6亿,满足业务需求.
-主键选择为了保证数据的均匀性,使用唯一主键作为分表主键,使用 hashcode函数,对 32 取余,分到各个表中.
-同步脚本的编写开始编写脚本时,发现了两个问题
-
-
-在取旧数据时使用的 offs
+主键选择使用 openid(28 位字符串) 作为分表主键,使用 hashcode函数,对 32 取余,分到各个表中.ps: 用户的数据不多的话，有的用户数据多，有的用户数据少. 不一定能保证数
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -1912,7 +1930,7 @@ w 发生在 r之前
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1923,7 +1941,7 @@ w 发生在 r之前
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-count">41</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
