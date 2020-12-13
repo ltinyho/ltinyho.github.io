@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[lvm group 重名导致 centos 启动失败]]></title>
+    <url>%2F2020%2F12%2F05%2Flvm-same-group-name%2F</url>
+    <content type="text"><![CDATA[背景使用 lvm 格式在磁盘 A 上安装 centos7 系统,使用默认的 group 名称. 在 磁盘 A(全部剩余空间) 和磁盘 B 上搭建 lvm mirror 模式. 当磁盘 A 损坏时,希望能迁移出磁盘 B 的数据.最开始想的时将磁盘 B 挂载到安装了新系统的磁盘 C,实际出现 磁盘 C 系统启动失败的问题. 原因磁盘 C 和磁盘 B 的 group 名称相同,导致系统找不到磁盘 C 的启动卷. 解决方案方法一： 进入急救系统，修改B 盘 vg 的名称 方法二： 进入系统 C，修改 C 盘 vg的名称，注意需要修改grub和 fstab 的配置方案三: 重装系统 C,安装的时候使用不重名的 group 名称. 方法一存在的问题： 使用 vgrename 不能选定 uuid 改名 参考 Rename multiple Volume Groups VGs / Logical Volumes with the same name 推荐使用方案二,三,比较方便修改.]]></content>
+  </entry>
+  <entry>
     <title><![CDATA[从程序员到架构师，从架构师到CTO (笔记)]]></title>
     <url>%2F2020%2F11%2F15%2Farchitect-ability%2F</url>
     <content type="text"><![CDATA[洪强宁：从程序员到架构师，从架构师到CTO 优秀架构师的能力： 取舍 不同业务场景的需求和关注点不同，导致架构设计也是不同的。比如：在线直播关注时延，安全，离线业务关注吞吐率，基于不同场景做取舍。 前瞻 对未来不确定的事情提前做考虑.既有技术上的发展,也要有基于业务发展的考虑. 抽象 软件开发是复杂的,需要识别复杂度的来源,分层抽象隔离复杂度.系统全局视角,组件角色定义,不过早进入组件细节中.(写业务代码也是一样,先写伪代码,在实现细节.) 容错后端开发是面向错误的开发.架构师所处的环境就更恶劣了.第一,面向错误设计,事前先做解决方案(解决方案需要事前做好演练,不能等出现问题才发现方案有问题).第二个问题是数据做好备份,没有备份的日子总是提心吊胆.第三,出现故障时如何处理?只换不修,快速切换到正常状态.]]></content>
