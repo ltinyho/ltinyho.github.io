@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="manifest" href="/images/manifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.ltinyho.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"517HTSWU9U","apiKey":"6996019cc0eab1d5c8a63c8b69d9ec67","indexName":"blog","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="ltinyho&#39;s Blog">
+<meta property="og:url" content="http://blog.ltinyho.top/page/5/index.html">
+<meta property="og:site_name" content="ltinyho&#39;s Blog">
+<meta property="og:locale">
+<meta property="article:author" content="ltinyho">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://blog.ltinyho.top/page/5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>ltinyho's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ltinyho's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/ltinyho" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content index posts-expand">
+            
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/05/07/mac-iterm2-config/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/05/07/mac-iterm2-config/" class="post-title-link" itemprop="url">iterm2 使用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-07 21:08:00" itemprop="dateCreated datePublished" datetime="2019-05-07T21:08:00+08:00">2019-05-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-02 09:45:09" itemprop="dateModified" datetime="2023-09-02T09:45:09+08:00">2023-09-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mac/" itemprop="url" rel="index"><span itemprop="name">mac</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><code>iterm2</code> 终端置顶操作,参照下面设置<br> <a target="_blank" rel="noopener" href="https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus">https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/04/24/vue-package-compatible-resolve/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/24/vue-package-compatible-resolve/" class="post-title-link" itemprop="url">vue 打包兼容性处理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-04-24 07:40:00" itemprop="dateCreated datePublished" datetime="2019-04-24T07:40:00+08:00">2019-04-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-02 09:45:09" itemprop="dateModified" datetime="2023-09-02T09:45:09+08:00">2023-09-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/vue/" itemprop="url" rel="index"><span itemprop="name">vue</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>最近在新加入一个包时,导致打包后的代码不能在低版本的 <code>ios</code> 上运行,使用模拟器查看,发现打包后的代码还存在 <code>es6</code> 的代码，导致不兼容。</p>
+<h3 id="调试步骤"><a href="#调试步骤" class="headerlink" title="调试步骤"></a>调试步骤</h3><ul>
+<li>安装 <code>xcode</code>与 <code>simulator</code>，需要安装 <code>ios</code> 低版本的模拟器</li>
+<li>打包代码,请先开启不压缩代码,方便查看.具体关闭压缩方式,查看文档,<code>vue-cli vue.config.js</code> 配置为 <code>config.optimization.minimize=false</code></li>
+<li>打开模拟器，开启 <code>safari</code> 调试模式,如截图所示<br> <a target="_blank" rel="noopener" href="https://i.loli.net/2019/04/24/5cbfa3d6a4022.jpg"><img src="https://i.loli.net/2019/04/24/5cbfa3d6a4022.jpg" alt="20190424074548.jpg"></a></li>
+<li>在 <code>safari</code> 中查看具体的报错信息,定位问题</li>
+</ul>
+<h3 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h3><p>加入的新包作者没有提供编译后的代码,所以需要自己处理一下<br><code>vue.config.js</code> 配置如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 处理未经 `babel` 编译的包</span></span><br><span class="line"><span class="attr">transpileDependencies</span>: [<span class="string">&#x27;tencent-wx-jssdk&#x27;</span>]</span><br></pre></td></tr></table></figure>
+<p>使用 <code>jenkins</code> 打包,使用的 <code>cnpm</code>安装的包,打包后会出现问题,换成 <code>npm</code> 打包就没有问题,具体原因还没有查清楚.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/02/27/service-problem-record/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/02/27/service-problem-record/" class="post-title-link" itemprop="url">复盘服务器不稳定问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-27 20:41:00" itemprop="dateCreated datePublished" datetime="2019-02-27T20:41:00+08:00">2019-02-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-02 09:45:09" itemprop="dateModified" datetime="2023-09-02T09:45:09+08:00">2023-09-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%8D%E7%9B%98/" itemprop="url" rel="index"><span itemprop="name">复盘</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>最近市场的同学通过一系列活动激活了很多用户,日活用户激增,导致服务器不稳定.<br>根据以往经验一一排查,下面是排查问题的过程.</p>
+<ul>
+<li>1.一般都是数据库的瓶颈,查看数据库的 <code>cpu使用率</code> 和 <code>cpu负载</code> 都正常,加了一个<code>只读库</code>,情况大大好转.</li>
+<li>2.然后排查服务器的 <code>cpu使用率</code> 和 <code>cpu负载</code>,也是正常.</li>
+<li>3.排查容器服务节点的资源消耗,应用服务容器节点 <code>cpu使用率</code> 在正常的情况.</li>
+<li>4.怀疑 <code>自定义路由 proxy</code> 服务的问题,遂查看服务容器节点的资源消耗,发现 <code>cpu使用率</code> 有时候会超过100%,决定增加 <code>proxy</code> 的容器数量.增加 <code>proxy</code> 容器数量需要新加集群节点,所以决定新增服务器.</li>
+<li>5.新增服务器后情况得到缓解,但是还有服务不稳定的情况.这个时候 <code>ecs</code> 的 <code>cpu使用率</code> 和 <code>cpu负载</code>都很低了, <code>proxy</code> 的资源消耗有部分节点 <code>cpu使用率</code>超过100%,但是大部分已经是正常的了.这个时候一直找不到原因,但是用户那边一直反馈服务还是不稳定.一直认为是 <code>proxy</code> 的问题,所以提交了工单,询问阿里云工程师怎样提高<code>proxy</code>服务的<code>cpu资源</code>,阿里云工程师建议使用 <code>scale</code>,增加 <code>proxy</code> 容器的数量.<br>因为重新调度 <code>proxy</code> 会导致<strong>服务停止30s</strong>左右,为了不影响用户,也不确定是否能解决问题,所以决定等晚上再操作,继续增加容器节点,提高 <code>proxy</code> 容器节点.</li>
+<li>6.增加服务器后,情况并没有得到缓解,还是会出现该问题.同时,同事查看了负载均衡的监控数据,发现负载均衡出现丢弃连接数,正常情况<strong>1个</strong>丢弃连接数都不应该出现的,查看负载均衡配置,只支持 5000 并发连接数,遂升级负载均衡配置,后续持续观察,服务变得稳定.</li>
+</ul>
+<h4 id="中间插曲"><a href="#中间插曲" class="headerlink" title="中间插曲"></a>中间插曲</h4><ul>
+<li>1.新增容器节点服务部署失败,拉取不了镜像.新增的节点没有绑定公网 <code>ip</code>,不能访问公网,需要绑定公网 <code>ip</code> 或者使用 <code>vpc</code> 的 <code>NAT网关</code>.</li>
+<li>2.新增容器节点连不上 <code>redis</code>,最开始没有设置 <code>redis</code>连接白名单,后来设置之后还是连不上,提交阿里云工单咨询工程师,白名单添加无效,经阿里云修复后解决.将 <code>redis</code> 也加到安全组中.</li>
+<li>3.对阿里云容器服务编排模板自定义便签 <code> cpu_shares: 50 #0.5核</code> 和 <code>mem_limit: 536870912 #512MB</code>的认知有歧义,在不确定意思的情况下进行了操作.查询 <code>docker</code> 文档后 <a target="_blank" rel="noopener" href="https://docs.docker.com/config/containers/resource_constraints/">容器资源限制</a><br><code>docker</code> 默认对容器不做限制.</li>
+</ul>
+<h3 id="问题再次出现预防手段"><a href="#问题再次出现预防手段" class="headerlink" title="问题再次出现预防手段"></a>问题再次出现预防手段</h3><h4 id="确定问题排查步骤"><a href="#确定问题排查步骤" class="headerlink" title="确定问题排查步骤"></a>确定问题排查步骤</h4><h5 id="服务架构"><a href="#服务架构" class="headerlink" title="服务架构"></a>服务架构</h5><h5 id="排查步骤"><a href="#排查步骤" class="headerlink" title="排查步骤"></a>排查步骤</h5><h5 id="增加服务报警"><a href="#增加服务报警" class="headerlink" title="增加服务报警"></a>增加服务报警</h5><ul>
+<li>并发丢弃报警</li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>经过这次事件,总结如下:</p>
+<ul>
+<li>1、需要对整个流程都清晰</li>
+<li>2、不清楚的操作一定要在了解清楚后在操作，不要拿用户去冒险</li>
+<li>3、犯的错误需要记录下来，转变成文字</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2019/02/24/hackintosh-problem/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/02/24/hackintosh-problem/" class="post-title-link" itemprop="url">黑苹果装机问题记录</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-24 16:56:00" itemprop="dateCreated datePublished" datetime="2019-02-24T16:56:00+08:00">2019-02-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-02 09:45:09" itemprop="dateModified" datetime="2023-09-02T09:45:09+08:00">2023-09-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%BB%91%E8%8B%B9%E6%9E%9C/" itemprop="url" rel="index"><span itemprop="name">黑苹果</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="台式机装机问题"><a href="#台式机装机问题" class="headerlink" title="台式机装机问题"></a>台式机装机问题</h2><h3 id="下载镜像，制作启动U盘"><a href="#下载镜像，制作启动U盘" class="headerlink" title="下载镜像，制作启动U盘"></a>下载镜像，制作启动U盘</h3><p>台式机配置:</p>
+<ul>
+<li>CPU  i7-8700  </li>
+<li>主板  华硕 B360</li>
+<li>显卡  GTX 1050 TI</li>
+</ul>
+<p>镜像版本 10.13.6</p>
+<p>一般都到<a target="_blank" rel="noopener" href="https://blog.daliansky.net/categories/%E4%B8%8B%E8%BD%BD/">黑果小兵</a>下载, 我安装的是 <code>10.13.6</code>，最新 <code>10.14</code> 驱不动。下载完成使用 <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1rIbY81oz_DdJvlX49SpBbg">TransMac</a> 制作启动盘</p>
+<p><a target="_blank" rel="noopener" href="http://www.xitongcheng.com/jiaocheng/xtazjc_article_41339.html">制作启动盘教程</a></p>
+<p>其他正常安装即可</p>
+<h3 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h3><p>遇到问题还是要查英文,中文真的找不到.</p>
+<h4 id="黑苹果安装到最后两分钟卡住不动"><a href="#黑苹果安装到最后两分钟卡住不动" class="headerlink" title="黑苹果安装到最后两分钟卡住不动"></a>黑苹果安装到最后两分钟卡住不动</h4><p><a target="_blank" rel="noopener" href="https://www.tonymacx86.com/threads/mojave-installation-freezes-at-2-minutes-left.262173/page-3#post-1855421">https://www.tonymacx86.com/threads/mojave-installation-freezes-at-2-minutes-left.262173/page-3#post-1855421</a></p>
+<p>24楼提供的解决方案<br><a target="_blank" rel="noopener" href="https://i.loli.net/2019/02/24/5c7271ba93645.png"><img src="https://i.loli.net/2019/02/24/5c7271ba93645.png" alt="解决方案.png"></a><br>我是以网友提供的<code>EFI</code>为主,加上我原来就能启动的<code>EFI</code>的里面的驱动目录覆盖他的驱动,我的EFI <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1Ti0deNPVqQ9j3QOHhiF94w">下载地址</a></p>
+<h4 id="黑苹果-webdriver-显卡不能切换成独显"><a href="#黑苹果-webdriver-显卡不能切换成独显" class="headerlink" title="黑苹果 webdriver 显卡不能切换成独显"></a>黑苹果 <code>webdriver</code> 显卡不能切换成独显</h4><p><a target="_blank" rel="noopener" href="https://www.tonymacx86.com/threads/nvidia-releases-alternate-graphics-drivers-for-macos-high-sierra-10-13-6-387-10-10-10-40.255913/">https://www.tonymacx86.com/threads/nvidia-releases-alternate-graphics-drivers-for-macos-high-sierra-10-13-6-387-10-10-10-40.255913/</a></p>
+<p><a target="_blank" rel="noopener" href="https://i.loli.net/2019/02/24/5c7274759d4be.png"><img src="https://i.loli.net/2019/02/24/5c7274759d4be.png" alt="图片.png"></a><br>1楼提供的解决方案,需要下载软件,<a target="_blank" rel="noopener" href="https://www.tonymacx86.com/resources/categories/tonymacx86-downloads.3/">下载地址</a><code>,设置 </code>Bootloaders &gt; Clover UEFI Boot Mode + Emulated NVRAM&#96; 即可</p>
+<h4 id="黑苹果双屏问题"><a href="#黑苹果双屏问题" class="headerlink" title="黑苹果双屏问题"></a>黑苹果双屏问题</h4><p><a target="_blank" rel="noopener" href="https://www.tonymacx86.com/threads/solved-black-screen-with-dual-monitor-connected.223082/page-4">https://www.tonymacx86.com/threads/solved-black-screen-with-dual-monitor-connected.223082/page-4</a><br>第39楼<br>驱动装好之后,接双屏不能启动.首先需要开启 <code>BIOS</code> 的 <code>CMS</code> 模式,然后修改配置,修改软件 <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1qf4qkE3FfvO6Z2IdK2rzJw">Clover Configurator</a><br>我的正确配置如下图<br><a target="_blank" rel="noopener" href="https://i.loli.net/2019/02/24/5c728059cbc4f.jpg"><img src="https://i.loli.net/2019/02/24/5c728059cbc4f.jpg" alt="2-2.jpg"></a></p>
+<h2 id="笔记本装机问题"><a href="#笔记本装机问题" class="headerlink" title="笔记本装机问题"></a>笔记本装机问题</h2><p><code>hd630</code> 显存只有 <code>7M</code>,修改设置 <code>Devices Fake ID</code>,<code>ig-platform-id</code>.<br>注意需要 <code>IntelGraphicsDVMTFixup.kext</code> 驱动</p>
+<p>原来的<code>ig-platform-id=0x12345678</code><br><a target="_blank" rel="noopener" href="https://i.loli.net/2019/03/24/5c970db1880b8.png"><img src="https://i.loli.net/2019/03/24/5c970db1880b8.png" alt="原ig-platform-id.png"></a></p>
+<p>根据对应设备设置对应的<code>ig-platform-id</code>即可.<br><a target="_blank" rel="noopener" href="https://i.loli.net/2019/03/24/5c970db1880b5.jpg"><img src="https://i.loli.net/2019/03/24/5c970db1880b5.jpg" alt="FakeID设置.jpg"></a><br><a target="_blank" rel="noopener" href="https://i.loli.net/2019/03/24/5c970db2abd83.png"><img src="https://i.loli.net/2019/03/24/5c970db2abd83.png" alt="图片.png"></a><br><a target="_blank" rel="noopener" href="https://i.loli.net/2019/03/24/5c970db142496.jpg"><img src="https://i.loli.net/2019/03/24/5c970db142496.jpg" alt="成功图.jpg"></a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.ltinyho.top/2018/12/08/redis-start/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ltinyho">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ltinyho's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/12/08/redis-start/" class="post-title-link" itemprop="url">redis 入门</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-12-08 13:51:57" itemprop="dateCreated datePublished" datetime="2018-12-08T13:51:57+08:00">2018-12-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-02 09:45:09" itemprop="dateModified" datetime="2023-09-02T09:45:09+08:00">2023-09-02</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><p><code>redis</code> 使用C语言编写的高性能键值对内存数据库,<a target="_blank" rel="noopener" href="https://github.com/antirez/redis">仓库地址</a></p>
+<p>支持的键值数据类型:</p>
+<ul>
+<li>字符串</li>
+<li>列表</li>
+<li>有序集合</li>
+<li>散列</li>
+<li>集合</li>
+</ul>
+<p><code>redis</code>的主要应用场景:</p>
+<ul>
+<li>缓存</li>
+<li>消息队列</li>
+<li>计数</li>
+<li>排行榜</li>
+</ul>
+<h3 id="二、redis-数据类型"><a href="#二、redis-数据类型" class="headerlink" title="二、redis 数据类型"></a>二、<code>redis</code> 数据类型</h3><p>键值对<code>key</code>的注意事项：</p>
+<ul>
+<li>不要过长 最好不要超过1024个字节,不仅消耗内存，也影响查找效率</li>
+<li>不要过短 比如设置为a，没有实际意义，可能会降低key的可读性</li>
+<li>统一命名规范</li>
+</ul>
+<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><p><code>string</code> 中的一个 <code>key</code> 对应一个 <code>value </code></p>
+<p>常用命令:</p>
+<ul>
+<li><code>set      key  value</code>      # 赋值</li>
+<li><code>get      key          </code>      # 取值</li>
+<li><code>getset   key  value   </code>   # 取原值并设置新值</li>
+<li><code>incr     key          </code>     #  自增1,如果该key不存在，则创建该key，并赋值为0，key存在,则自增加1</li>
+<li><code>incrby   key  num     </code>   # 自增指定值</li>
+<li><code>decr     key          </code>     # 自减</li>
+<li><code>decrby   key  num     </code>   # 自减指定值</li>
+</ul>
+<h4 id="哈希-hash"><a href="#哈希-hash" class="headerlink" title="哈希 hash"></a>哈希 hash</h4><p>hash可以存储多个键值对之间的映射</p>
+<ul>
+<li><code>hset key field value</code>  # 设置单个</li>
+<li><code>hmset key field value [field value ... ]</code> # 一次设置多个</li>
+</ul>
+<h4 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h4><ul>
+<li><code>lpush key value [value ...]</code> # 从列表左边推入</li>
+<li><code>rpush key value [value ...]</code> # 从列表右边推入</li>
+<li><code>lrange key start stop</code>        # 查看列表,<code>lrange key 0 -1</code> 查看整个列表</li>
+</ul>
+<h4 id="通用-key-操作"><a href="#通用-key-操作" class="headerlink" title="通用 key 操作"></a>通用 <code>key</code> 操作</h4><ul>
+<li><code>expire  key second </code>     # 设置 key 的有效期</li>
+<li><code>ttl     key        </code>     # 查看 key 的离到期还剩多少秒</li>
+<li><code>type    key        </code>     # 查看 key 的类型</li>
+<li><code>del     key        </code>     #删除 key</li>
+</ul>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xinysu/p/7366142.html#_label1">Redis 入门笔记</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ltinyho</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ltinyho" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ltinyho" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ltinyho</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
